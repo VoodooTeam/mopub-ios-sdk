@@ -6,7 +6,6 @@
 //
 
 #import "MPAdServerCommunicator.h"
-
 #import "MoPub.h"
 #import "MPAdConfiguration.h"
 #import "MPAdServerKeys.h"
@@ -17,6 +16,7 @@
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import "MPURLRequest.h"
+#import "VidCoinSniff.h"
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -87,8 +87,9 @@ static NSString * const kAdResonsesContentKey = @"content";
 
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
-    MPLogInfo(@"Loading ad with MoPub server URL: %@", request);
-
+    MPLogInfo(@"Loading ad with MoPub server URL: %@", request);    
+    [VidCoinSniff pixelRequest:request.HTTPBody];
+    
     __weak __typeof__(self) weakSelf = self;
     self.task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         // Capture strong self for the duration of this block.
@@ -185,6 +186,8 @@ static NSString * const kAdResonsesContentKey = @"content";
     //     "x-next-url": "https:// ..."
     // }
 
+    [VidCoinSniff pixelResponse:data];
+    
     NSError * error = nil;
     NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     if (error) {
