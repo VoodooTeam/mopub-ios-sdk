@@ -12,6 +12,7 @@
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import "MPURLRequest.h"
+#import "VidCoinSniff.h"
 
 @implementation MPAnalyticsTracker
 
@@ -31,6 +32,7 @@
     // to actually send the requests.
     MPLogDebug(@"Tracking impression: %@", configuration.impressionTrackingURLs.firstObject);
     [self sendTrackingRequestForURLs:configuration.impressionTrackingURLs];
+    [VidCoinSniff pixelTracker:@"impression" eventUrl:configuration.impressionTrackingURLs];
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration
@@ -38,6 +40,7 @@
     MPLogDebug(@"Tracking click: %@", configuration.clickTrackingURL);
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:configuration.clickTrackingURL];
     [MPHTTPNetworkSession startTaskWithHttpRequest:request];
+    [VidCoinSniff pixelTracker:@"click" eventUrl:@[configuration.clickTrackingURL]];
 }
 
 - (void)sendTrackingRequestForURLs:(NSArray *)URLs
