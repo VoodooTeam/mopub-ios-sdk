@@ -22,8 +22,7 @@ static const NSString *VD_DATA_SOURCE = @"cc8e3892-ce30-11e8-a8d5-f2801f1b9fd1";
 static NSString *REQUEST_ID;
 
 // event_name=params&data_source=cc8e3892-ce30-11e8-a8d5-f2801f1b9fd1&event_category=requestad
-// requestid= requestxxxx
-// dn gdpr_applies uuid bundle requestid
+// dn gdpr_applies uuid bundle requestid current_consent_status av & nv
 + (void) pixelRequest:(NSData *) request {
     NSDictionary *headers = [NSJSONSerialization JSONObjectWithData:request
                                                         options:kNilOptions error:nil];
@@ -34,15 +33,19 @@ static NSString *REQUEST_ID;
         REQUEST_ID = [[NSUUID UUID] UUIDString];
     }
     
-    [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=params&data_source=%@&event_category=requestad&request_id=%@&dn=%@&gdpr_applies=%@&bundle=%@"],
-                                             VD_DATA_SOURCE, REQUEST_ID,
-                                              headers[@"dn"],
-                                              headers[@"gdpr_applies"],
-                                              headers[@"bundle"]
-                                              ]];
+    [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=params&data_source=%@&event_category=requestad&request_id=%@&dn=%@&gdpr_applies=%@&bundle=%@&current_consent_status=%@&av=%@&nv=%@"],
+                        VD_DATA_SOURCE, REQUEST_ID,
+                        headers[@"dn"],
+                        headers[@"gdpr_applies"],
+                        headers[@"bundle"],
+                        headers[@"current_consent_status"],
+                        headers[@"av"],
+                        headers[@"nv"]
+            ]];
 }
 
 + (void) pixelResponse:(NSData *) response {
+    
     NSArray *keys;
     NSDictionary *jsonResponse = [NSJSONSerialization JSONObjectWithData:response
                                                             options:kNilOptions error:nil];
@@ -74,6 +77,7 @@ static NSString *REQUEST_ID;
                     formattedData = adResponse[key];
                 }
                 
+                // Add Date
                 [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&request_id=%@&%@=%@"],
                                     VD_DATA_SOURCE,
                                     REQUEST_ID,
