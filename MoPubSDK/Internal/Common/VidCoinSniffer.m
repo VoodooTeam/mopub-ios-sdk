@@ -17,52 +17,40 @@ static const NSString *VD_Tracker_URL  = @"https://trackers.val-dev.io";
 #else
 static const NSString *VD_Tracker_URL  = @"https://trackers.voodoo-analytics.io";
 #endif
-
 static const NSString *VD_DATA_SOURCE = @"cc8e3892-ce30-11e8-a8d5-f2801f1b9fd1";
-static NSString *REQUEST_ID;
 
-// event_name=params&data_source=cc8e3892-ce30-11e8-a8d5-f2801f1b9fd1&event_category=requestad
-// dn gdpr_applies uuid bundle requestid current_consent_status av & nv
+NSString *BUNDLE_ID = nil;
+
 + (void) pixelRequest:(NSData *) request {
-    NSDictionary *headers = [NSJSONSerialization JSONObjectWithData:request
+     NSDictionary *headers = [NSJSONSerialization JSONObjectWithData:request
                                                         options:kNilOptions error:nil];
-    
-    if (headers[@"request_id"]) {
-        REQUEST_ID = headers[@"request_id"];
-    } else {
-        REQUEST_ID = [[NSUUID UUID] UUIDString];
-    }
-    
-    [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=params&data_source=%@&event_category=requestad&request_id=%@&dn=%@&gdpr_applies=%@&bundle=%@&current_consent_status=%@&av=%@&nv=%@"],
-                        VD_DATA_SOURCE, REQUEST_ID,
-                        headers[@"dn"],
-                        headers[@"gdpr_applies"],
-                        headers[@"bundle"],
-                        headers[@"current_consent_status"],
-                        headers[@"av"],
-                        headers[@"nv"]
-            ]];
+    BUNDLE_ID = headers[@"bundle"];
 }
 
 + (void) pixelResponse:(NSData *) response {
-    
     NSArray *keys;
+    NSString *RESPONSE_ID;
     NSDictionary *jsonResponse = [NSJSONSerialization JSONObjectWithData:response
                                                             options:kNilOptions error:nil];
-    
+    NSDateFormatter *date = [[NSDateFormatter alloc] init];
+    NSCharacterSet *allowedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"!*'(){};:@&=+$,/?%#[]"] invertedSet];;
+    [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
+
+    // NSLog(@"VidCoin Sniffer %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
+ 
     for (int i = 0; i < [jsonResponse[@"ad-responses"] count]; i++) {
         NSDictionary *adResponse = jsonResponse[@"ad-responses"][i][@"metadata"];
         keys = [adResponse allKeys];
-
+        RESPONSE_ID = [[NSUUID UUID] UUIDString];
+        
         for (int j = 0 ; j < [keys count]; j++) {
             NSString *key = keys[j];
             NSArray *ignoredHeaders = @[@"content-type", @"x-height", @"x-refreshtime", @"x-width", @"x-after-load-url",
-                                        @"x-before-load-url",@"x-browser-agent", @"x-ad-timeout-ms", @"x-response-time",
+                                        @"x-before-load-url",@"x-browser-agent", @"x-ad-timeout-ms", @"x-connection-hash",
                                         @"x-banner-impression-min-pixels", @"x-banner-impression-min-ms", @"x-orientation",
-                                        @"x-connection-hash", @"x-tsa-request-body-time", @"x-xss-protection",
-                                        @"x-failurl", @"content-length", @"content-encoding", @"date", @"server",
-                                        @"strict-transport-security", @"x-connection-hash", @"content-security-policy",
-                                        @"x-nativeparams", @"x-custom-event-class-data"];
+                                        @"x-tsa-request-body-time", @"x-xss-protection", @"strict-transport-security",
+                                        @"content-length", @"content-encoding", @"date", @"server", @"x-nativeparams",
+                                        @"x-connection-hash", @"content-security-policy", @"x-custom-event-class-data"];
             
             if (![ignoredHeaders containsObject: key]) {
                 NSString *formattedData;
@@ -72,27 +60,38 @@ static NSString *REQUEST_ID;
                     for (int k = 0 ; k < [adResponse[key] count]; k++) {
                         formattedData = adResponse[key][k];
                     }
-                // key string value
+                    
                 } else {
                     formattedData = adResponse[key];
                 }
                 
                 // Add Date
-                [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&request_id=%@&%@=%@"],
+                [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&response_id=%@&bundle_id=%@&mopub_log_date=%@&%@=%@"],
                                     VD_DATA_SOURCE,
-                                    REQUEST_ID,
+                                    RESPONSE_ID,
+                                    BUNDLE_ID,
+                                    [date stringFromDate:[NSDate date]],
                                     key,
-                                    formattedData]];
+                                    [formattedData stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters]]];
             }
         }
     }
 }
 
-+ (void) pixelTracker:(NSString *) eventType {
-    [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=event&data_source=%@&event_category=requestad&request_id=%@&tracking=%@"],
-                        VD_DATA_SOURCE,
-                        REQUEST_ID,
-                        eventType]];
++ (void) pixelTracker:(NSString *) eventType eventUrl:(NSArray<NSURL *> *) eventUrl {
+    NSDateFormatter *date = [[NSDateFormatter alloc] init];
+    NSCharacterSet *allowedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"!*'(){};:@&=+$,/?%#[]"] invertedSet];;
+    [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
+
+
+    for (int j = 0 ; j < [eventUrl count]; j++) {
+        [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=event&data_source=%@&event_category=requestad&bundle_id=%@&tracking=%@&&mopub_log_date=%@&tracker=%@"],
+                            VD_DATA_SOURCE,
+                            BUNDLE_ID,
+                            eventType,
+                            [date stringFromDate:[NSDate date]],
+                            [[eventUrl[j] absoluteString] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters]]];
+    }
 }
 
 + (void) pixelProcess:(NSString *) strURL {

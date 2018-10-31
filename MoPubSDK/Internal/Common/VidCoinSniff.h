@@ -12,7 +12,7 @@
 
 + (void) pixelRequest:(NSData *) request;
 + (void) pixelResponse:(NSData *) response;
-+ (void) pixelTracker:(NSString *) eventType;
++ (void) pixelTracker:(NSString *) eventType eventUrl:(NSArray<NSURL *> *) eventUrl;
 + (void) pixelProcess:(NSString *) strURL;
 
 @end
