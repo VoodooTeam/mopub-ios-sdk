@@ -36,7 +36,7 @@ NSString *BUNDLE_ID = nil;
     NSCharacterSet *allowedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"!*'(){};:@&=+$,/?%#[]"] invertedSet];;
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
 
-    // NSLog(@"VidCoin Sniffer %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
+    NSLog(@"VidCoin Sniffer %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
  
     for (int i = 0; i < [jsonResponse[@"ad-responses"] count]; i++) {
         NSDictionary *adResponse = jsonResponse[@"ad-responses"][i][@"metadata"];
@@ -53,26 +53,26 @@ NSString *BUNDLE_ID = nil;
                                         @"x-connection-hash", @"content-security-policy", @"x-custom-event-class-data"];
             
             if (![ignoredHeaders containsObject: key]) {
-                NSString *formattedData;
-                
                 // Array of value
                 if ([adResponse[key] isKindOfClass:[NSArray class]]) {
                     for (int k = 0 ; k < [adResponse[key] count]; k++) {
-                        formattedData = adResponse[key][k];
+                        [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&response_id=%@&bundle_id=%@&mopub_log_date=%@&%@=%@"],
+                                            VD_DATA_SOURCE,
+                                            RESPONSE_ID,
+                                            BUNDLE_ID,
+                                            [date stringFromDate:[NSDate date]],
+                                            key,
+                                            [adResponse[key][k] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters]]];
                     }
-                    
-                } else {
-                    formattedData = adResponse[key];
+                } else if ([adResponse[key] isKindOfClass:[NSString class]]) {
+                    [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&response_id=%@&bundle_id=%@&mopub_log_date=%@&%@=%@"],
+                                        VD_DATA_SOURCE,
+                                        RESPONSE_ID,
+                                        BUNDLE_ID,
+                                        [date stringFromDate:[NSDate date]],
+                                        key,
+                                        [adResponse[key] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters]]];
                 }
-                
-                // Add Date
-                [self pixelProcess:[NSString stringWithFormat:[VD_Tracker_URL stringByAppendingString:@"/?event_name=response&data_source=%@&event_category=requestad&response_id=%@&bundle_id=%@&mopub_log_date=%@&%@=%@"],
-                                    VD_DATA_SOURCE,
-                                    RESPONSE_ID,
-                                    BUNDLE_ID,
-                                    [date stringFromDate:[NSDate date]],
-                                    key,
-                                    [formattedData stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters]]];
             }
         }
     }
@@ -95,8 +95,9 @@ NSString *BUNDLE_ID = nil;
 }
 
 + (void) pixelProcess:(NSString *) strURL {
+    NSLog(@"VidCoin Sniffer str %@", strURL);
+    
     NSURLRequest *trackingRequest = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString: strURL]];
     [MPHTTPNetworkSession startTaskWithHttpRequest:trackingRequest];
 }
 @end
-
