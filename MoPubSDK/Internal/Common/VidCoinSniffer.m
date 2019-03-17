@@ -97,7 +97,7 @@ NSString *BUNDLE_ID = nil;
 + (void) pixelProcess:(NSString *) strURL {
     NSLog(@"VidCoin Sniffer str %@", strURL);
     
-    NSURLRequest *trackingRequest = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString: strURL]];
-    [MPHTTPNetworkSession startTaskWithHttpRequest:trackingRequest];
+    // NSURLRequest *trackingRequest = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString: strURL]];
+    // [MPHTTPNetworkSession startTaskWithHttpRequest:trackingRequest];
 }
 @end
