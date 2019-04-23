@@ -13,14 +13,29 @@
 @implementation VSAnalytics {
 }
 
-NSString * const VS_Tracker_URL  = @"https://cnk1a3i0b3.execute-api.eu-west-2.amazonaws.com/dev";
-const NSTimeInterval kVSTrackerTimeoutInterval = 10.0;
-NSString *SESSION_ID = nil;
-NSString *BUNDLE_ID = nil;
-bool DISABLED = true;
+static NSString *VS_Tracker_URL  = @"https://vs-analytics.voodoo-dev.io";
+static NSString *VS_INIT_URL  = @"https://voodoosauce.voodoo-dev.io/init?bundle_id=%@";
 
-+ (void) setLevel:(bool *) level {
-    DISABLED = level;
+static NSTimeInterval kVSTrackerTimeoutInterval = 10.0;
+static NSString *SESSION_ID = nil;
+static NSString *BUNDLE_ID = nil;
+static NSString *FIREHOSE_CHANNEL = nil;
+static BOOL DISABLED = YES;
+
++ (void) initTracker  {
+    BUNDLE_ID = [[NSBundle mainBundle] bundleIdentifier];
+    
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:VS_INIT_URL, BUNDLE_ID]]];
+    
+    [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
+        
+        NSDictionary *dicData = [NSJSONSerialization JSONObjectWithData:data
+                                                                   options:kNilOptions error:nil];
+        DISABLED = [dicData[@"disabled"] isEqualToString:@"yes"];
+        FIREHOSE_CHANNEL = dicData[@"firehoseChannel"];
+    } errorHandler:^(NSError * error) {
+        MPLogDebug(@"Failed to init vsanalytics");
+    }];
 }
 
 + (void) pixelRequest:(NSData *) request {
@@ -56,22 +71,23 @@ bool DISABLED = true;
     if (DISABLED) {
         return;
     }
-        NSDictionary *dicResponse = [NSJSONSerialization JSONObjectWithData:response
-                                                            options:kNilOptions error:nil];
-        NSDateFormatter *date = [[NSDateFormatter alloc] init];
-        [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
     
-        NSDictionary *data= @{
-                          @"meta": @{
-                                  @"app_id": BUNDLE_ID,
-                                  @"type": @"RESPONSE",
-                                  @"session_id": SESSION_ID,
-                                  @"processingDate": [date stringFromDate:[NSDate date]],
-                                  },
-                          @"event": dicResponse
-                          };
-    
-        [self pixelProcess:data];
+    NSDictionary *dicResponse = [NSJSONSerialization JSONObjectWithData:response
+                                                        options:kNilOptions error:nil];
+    NSDateFormatter *date = [[NSDateFormatter alloc] init];
+    [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
+
+    NSDictionary *data= @{
+                      @"meta": @{
+                              @"app_id": BUNDLE_ID,
+                              @"type": @"RESPONSE",
+                              @"session_id": SESSION_ID,
+                              @"processingDate": [date stringFromDate:[NSDate date]],
+                              },
+                      @"event": dicResponse
+                      };
+
+    [self pixelProcess:data];
 }
 
 + (void) pixelTracker:(NSString *) eventType
@@ -111,7 +127,7 @@ bool DISABLED = true;
 + (void) pixelProcess:(NSDictionary *) data {
     NSError *error;
     NSDictionary *record = @{
-                             @"DeliveryStreamName": @"vs-analytics-mopub",
+                             @"DeliveryStreamName": FIREHOSE_CHANNEL,
                              @"Record": @{
                                      @"Data": [[NSJSONSerialization dataWithJSONObject:data
                                                                                options:NSJSONWritingPrettyPrinted
@@ -131,10 +147,6 @@ bool DISABLED = true;
     
     [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)recordData.length] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:recordData];
-    [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * _Nonnull data, NSHTTPURLResponse * _Nonnull response) {
-        MPLogDebug(@"Successfully sent after load URL: %@", VS_Tracker_URL);
-    } errorHandler:^(NSError * _Nonnull error) {
-        MPLogDebug(@"Failed to send after load URL: %@", VS_Tracker_URL);
-    }];
+    [MPHTTPNetworkSession startTaskWithHttpRequest:request];
 }
 @end

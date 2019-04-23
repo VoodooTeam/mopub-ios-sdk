@@ -23,6 +23,7 @@
 #import "MPURLRequest.h"
 #import "NSString+MPConsentStatus.h"
 #import "MPAdConversionTracker.h"
+#import "VSAnalytics.h"
 
 // NSUserDefault keys
 static NSString * const kConsentedIabVendorListStorageKey        = @"com.mopub.mopub-ios-sdk.consented.iab.vendor.list";
@@ -1063,9 +1064,14 @@ static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
     NSString *newIfa = [MPIdentityProvider identifierFromASIdentifierManager:NO];
     // IFA reset
     if (self.currentStatus == MPConsentStatusConsented && ![oldIfa isEqualToString:newIfa] && newIfa != nil) {
+        
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kLastSynchronizedConsentStatusStorageKey];
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kIfaForConsentStorageKey];
         [self setCurrentStatus:MPConsentStatusUnknown reason:kConsentedChangedReasonIfaChanged shouldBroadcast:YES];
+    }
+    
+    if (self.currentStatus == MPConsentStatusConsented) {
+        [VSAnalytics initTracker];
     }
 }
 

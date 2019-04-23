@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface VSAnalytics : NSObject
-+ (void) setLevel:(bool *) level;
++ (void) initTracker;
 + (void) pixelRequest:(NSData *) request;
 + (void) pixelResponse:(NSData *) response;
 + (void) pixelTracker:(NSString *) eventType
