@@ -18,7 +18,7 @@
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import "MPURLRequest.h"
-#import "VidCoinSniff.h"
+#import "VSAnalytics.h"
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -90,7 +90,7 @@ static NSString * const kAdResonsesContentKey = @"content";
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
     MPLogEvent([MPLogEvent adRequestedWithRequest:request]);
-    [VidCoinSniff pixelRequest:request.HTTPBody];
+    [VSAnalytics pixelRequest:request.HTTPBody];
 
     __weak __typeof__(self) weakSelf = self;
     self.task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
@@ -179,7 +179,7 @@ static NSString * const kAdResonsesContentKey = @"content";
     //     "x-next-url": "https:// ..."
     // }
 
-    [VidCoinSniff pixelResponse:data];
+    [VSAnalytics pixelResponse:data];
 
     NSError * error = nil;
     NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];

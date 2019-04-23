@@ -867,9 +867,9 @@
 		BCFE67DA208508D3005E458A /* MPConsentChangedReason.m in Sources */ = {isa = PBXBuildFile; fileRef = BCFE67D8208508D3005E458A /* MPConsentChangedReason.m */; };
 		BCFE67DB208508D3005E458A /* MPConsentChangedReason.m in Sources */ = {isa = PBXBuildFile; fileRef = BCFE67D8208508D3005E458A /* MPConsentChangedReason.m */; };
 		BCFE67DC208508D3005E458A /* MPConsentChangedReason.m in Sources */ = {isa = PBXBuildFile; fileRef = BCFE67D8208508D3005E458A /* MPConsentChangedReason.m */; };
-		D04E09832179D04700BC16F5 /* VidCoinSniffer.m in Sources */ = {isa = PBXBuildFile; fileRef = D04E09822179D04700BC16F5 /* VidCoinSniffer.m */; };
-		D0982F272179FB6D003B52DB /* VidCoinSniffer.m in Sources */ = {isa = PBXBuildFile; fileRef = D04E09822179D04700BC16F5 /* VidCoinSniffer.m */; };
-		D0982F282179FB85003B52DB /* VidCoinSniff.h in Headers */ = {isa = PBXBuildFile; fileRef = D04E09812179D04600BC16F5 /* VidCoinSniff.h */; };
+		D04E09832179D04700BC16F5 /* VSAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = D04E09822179D04700BC16F5 /* VSAnalytics.m */; };
+		D0982F272179FB6D003B52DB /* VSAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = D04E09822179D04700BC16F5 /* VSAnalytics.m */; };
+		D0982F282179FB85003B52DB /* VSAnalytics.h in Headers */ = {isa = PBXBuildFile; fileRef = D04E09812179D04600BC16F5 /* VSAnalytics.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1511,8 +1511,8 @@
 		BCF9BDB92119FA7800A2F557 /* NSURLSessionTask+Testing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURLSessionTask+Testing.m"; sourceTree = "<group>"; };
 		BCFE67D7208508D3005E458A /* MPConsentChangedReason.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPConsentChangedReason.h; sourceTree = "<group>"; };
 		BCFE67D8208508D3005E458A /* MPConsentChangedReason.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPConsentChangedReason.m; sourceTree = "<group>"; };
-		D04E09812179D04600BC16F5 /* VidCoinSniff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VidCoinSniff.h; sourceTree = "<group>"; };
-		D04E09822179D04700BC16F5 /* VidCoinSniffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VidCoinSniffer.m; sourceTree = "<group>"; };
+		D04E09812179D04600BC16F5 /* VSAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSAnalytics.h; sourceTree = "<group>"; };
+		D04E09822179D04700BC16F5 /* VSAnalytics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VSAnalytics.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2107,8 +2107,8 @@
 				A72210311B792C6F0099DCF6 /* MPVideoConfig.m */,
 				A776A5081B5DDE0A00095706 /* MPXMLParser.h */,
 				A776A5091B5DDE0A00095706 /* MPXMLParser.m */,
-				D04E09812179D04600BC16F5 /* VidCoinSniff.h */,
-				D04E09822179D04700BC16F5 /* VidCoinSniffer.m */,
+				D04E09812179D04600BC16F5 /* VSAnalytics.h */,
+				D04E09822179D04700BC16F5 /* VSAnalytics.m */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -2538,7 +2538,7 @@
 				2AF032032016B78800909F29 /* MPMoPubRewardedVideoCustomEvent.h in Headers */,
 				2AF032042016B78800909F29 /* MPMoPubRewardedPlayableCustomEvent.h in Headers */,
 				2AF032052016B78800909F29 /* MPPrivateRewardedVideoCustomEventDelegate.h in Headers */,
-				D0982F282179FB85003B52DB /* VidCoinSniff.h in Headers */,
+				D0982F282179FB85003B52DB /* VSAnalytics.h in Headers */,
 				BC0ADDFB20810B3C000ADEA4 /* MPConsentError.h in Headers */,
 				2AF032062016B78800909F29 /* MPRewardedVideoAdapter.h in Headers */,
 				2AF032072016B78800909F29 /* MPRewardedVideoAdManager.h in Headers */,
@@ -2808,6 +2808,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = AEF1F31F16EF9AD700273462;
@@ -3038,7 +3039,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0982F272179FB6D003B52DB /* VidCoinSniffer.m in Sources */,
+				D0982F272179FB6D003B52DB /* VSAnalytics.m in Sources */,
 				2A27020B20214502004A72E6 /* MOPUBExperimentProvider.m in Sources */,
 				2A27020C20214502004A72E6 /* MOPUBActivityIndicatorView.m in Sources */,
 				2A27020D20214502004A72E6 /* MOPUBAVPlayer.m in Sources */,
@@ -3400,7 +3401,7 @@
 				A776A5661B5DDFF400095706 /* MPVASTMediaFile.m in Sources */,
 				A77FBEF618C533B400531E8A /* MPNativeAdRequestTargeting.m in Sources */,
 				AE515F73171F1B110086B464 /* MPInterstitialAdController.m in Sources */,
-				D04E09832179D04700BC16F5 /* VidCoinSniffer.m in Sources */,
+				D04E09832179D04700BC16F5 /* VSAnalytics.m in Sources */,
 				B2950B3F1FBE5E5B00C40BF5 /* MPBannerCustomEvent+Internal.m in Sources */,
 				B2FE8FAB2069B28900593089 /* NSDictionary+MPAdditions.m in Sources */,
 				AE515F74171F1B110086B464 /* MPInterstitialCustomEvent.m in Sources */,
