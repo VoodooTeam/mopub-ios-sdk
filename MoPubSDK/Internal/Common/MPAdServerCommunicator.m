@@ -19,6 +19,7 @@
 #import "MPLogging.h"
 #import "MPURLRequest.h"
 #import "VSAnalytics.h"
+#import "MPURL.h"
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -86,25 +87,29 @@ static NSString * const kAdResonsesContentKey = @"content";
         [self failLoadForSDKInit];
         return;
     }
-
+    NSString *idURl = [(MPURL *)URL stringForPOSTDataKey:@"id"] ?: [NSUUID UUID].UUIDString;
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
     MPLogEvent([MPLogEvent adRequestedWithRequest:request]);
     [VSAnalytics pixelRequest:request.HTTPBody];
-
+    [VSAnalytics calculateLatency:idURl];
+    NSLog(@"[SAUCE] request with %@", idURl);
+    
     __weak __typeof__(self) weakSelf = self;
     self.task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
-
+  
+        [VSAnalytics pixelResponse:data];
         // Handle the response.
         [strongSelf didFinishLoadingWithData:data];
-
     } errorHandler:^(NSError * error) {
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
-
         // Handle the error.
+      
+        [VSAnalytics pixelResponse:nil];
+        
         [strongSelf didFailWithError:error];
     }];
 
@@ -161,25 +166,6 @@ static NSString * const kAdResonsesContentKey = @"content";
 }
 
 - (void)didFinishLoadingWithData:(NSData *)data {
-    // Headers from the original HTTP response are intentionally ignored as laid out
-    // by the Client Side Waterfall design doc.
-    //
-    // The response data is a JSON payload conforming to the structure:
-    // {
-    //     "ad-responses": [
-    //                      {
-    //                          "metadata": {
-    //                              "adm": "some advanced bidding payload",
-    //                              "x-ad-timeout-ms": 5000,
-    //                              "x-adtype": "rewarded_video",
-    //                          },
-    //                          "content": "Ad markup goes here"
-    //                      }
-    //                      ],
-    //     "x-next-url": "https:// ..."
-    // }
-
-    [VSAnalytics pixelResponse:data];
 
     NSError * error = nil;
     NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];

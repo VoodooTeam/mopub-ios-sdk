@@ -494,7 +494,7 @@
 				ORGANIZATIONNAME = MoPub;
 				TargetAttributes = {
 					AE23238E16F78A17002C2082 = {
-						DevelopmentTeam = 4S7XS533V3;
+						DevelopmentTeam = TSKBEM2B5G;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -736,7 +736,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 4S7XS533V3;
+				DEVELOPMENT_TEAM = TSKBEM2B5G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../MoPubSDK/Viewability/MOAT",
@@ -772,7 +772,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 4S7XS533V3;
+				DEVELOPMENT_TEAM = TSKBEM2B5G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../MoPubSDK/Viewability/MOAT",

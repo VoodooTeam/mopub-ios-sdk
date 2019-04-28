@@ -9,6 +9,7 @@
 #import "VSAnalytics.h"
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
+#import <UIKit/UIKit.h>
 
 @implementation VSAnalytics {
 }
@@ -20,25 +21,29 @@ static NSTimeInterval kVSTrackerTimeoutInterval = 10.0;
 static NSString *SESSION_ID = nil;
 static NSString *BUNDLE_ID = nil;
 static NSString *FIREHOSE_CHANNEL = nil;
+static NSString *CUSTOM_CLASS = nil;
+static NSString *LATENCY_VALUE = nil;
+static NSString *CONNECTIVITY = @"NO";
 static BOOL DISABLED = YES;
 
 + (void) initTracker  {
     if (SESSION_ID == nil) {
         SESSION_ID =  [[NSUUID UUID] UUIDString];
     }
-    
+
     BUNDLE_ID = [[NSBundle mainBundle] bundleIdentifier];
+    
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:VS_INIT_URL, BUNDLE_ID]]];
     
     [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         
         NSDictionary *dicData = [NSJSONSerialization JSONObjectWithData:data
                                                                    options:kNilOptions error:nil];
-        
+
         DISABLED = [dicData[@"disabled"] isEqualToString:@"yes"]
             || arc4random_uniform(10) % [dicData[@"devideBy"] longValue] != 0
             || VS_VERSION < (int) dicData[@"minVersion"];
-            
+
         FIREHOSE_CHANNEL = dicData[@"firehoseChannel"];
     } errorHandler:^(NSError * error) {
         MPLogDebug(@"Failed to init vsanalytics");
@@ -49,7 +54,7 @@ static BOOL DISABLED = YES;
     if (DISABLED) {
         return;
     }
-    
+
     NSDictionary *dicRequest = [NSJSONSerialization JSONObjectWithData:request
                                                         options:kNilOptions error:nil];
     
@@ -62,7 +67,7 @@ static BOOL DISABLED = YES;
                                   @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
                                   @"type": @"REQUEST",
                                   @"session_id": SESSION_ID,
-                                  @"processingDate":  [date stringFromDate:[NSDate date]],
+                                  @"processingDate":  [date stringFromDate:[NSDate date]]
                                   },
                           @"event": dicRequest
                           };
@@ -70,12 +75,17 @@ static BOOL DISABLED = YES;
 }
 
 + (void) pixelResponse:(NSData *) response {
+  
+    NSDictionary *dicResponse;
+    
     if (DISABLED) {
         return;
     }
-    
-    NSDictionary *dicResponse = [NSJSONSerialization JSONObjectWithData:response
-                                                        options:kNilOptions error:nil];
+    if (response) {
+       dicResponse = [NSJSONSerialization JSONObjectWithData:response
+                                                                    options:kNilOptions error:nil];
+    }
+
     NSDateFormatter *date = [[NSDateFormatter alloc] init];
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
 
@@ -87,11 +97,13 @@ static BOOL DISABLED = YES;
                                       @"type": @"RESPONSE",
                                       @"session_id": SESSION_ID,
                                       @"processingDate": [date stringFromDate:[NSDate date]],
+                                      @"latency": LATENCY_VALUE ?:@"",
+                                      @"connectivityStatus": CONNECTIVITY,
                                       },
                               @"event": dicResponse[@"ad-responses"][i]
                               };
-        
-        [self pixelProcess:data];
+
+    [self pixelProcess:data];
     }
 }
 
@@ -154,5 +166,46 @@ static BOOL DISABLED = YES;
     [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)recordData.length] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:recordData];
     [MPHTTPNetworkSession startTaskWithHttpRequest:request];
+}
+
+
++ (void)startLatencyCalcul:(NSString *)customId{
+    CUSTOM_CLASS = customId;
+    [VSAnalytics connectivity];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    [defaults setObject:[NSDate date] forKey:CUSTOM_CLASS];
+    [defaults synchronize];
+}
+
+
++ (void)calculateLatency:(NSString *)customClass{
+  
+    if (CUSTOM_CLASS && [NSUserDefaults.standardUserDefaults objectForKey:CUSTOM_CLASS]){
+        NSDate *start = [NSUserDefaults.standardUserDefaults objectForKey:CUSTOM_CLASS];
+        
+        [NSUserDefaults.standardUserDefaults removeObjectForKey:CUSTOM_CLASS];
+        [NSUserDefaults.standardUserDefaults synchronize];
+        
+        NSTimeInterval lastTime = ([NSDate date].timeIntervalSince1970 - start.timeIntervalSince1970);
+        CGFloat rounded_down = floorf(lastTime * 100) / 100;
+        LATENCY_VALUE = [NSString stringWithFormat:@"%.02f s", rounded_down];
+        
+        NSLog(@"[SAUCE] latency for custom %@",customClass);
+        CUSTOM_CLASS = nil;
+    }
+    
+    [VSAnalytics startLatencyCalcul:customClass];
+}
+
++ (void)connectivity
+{
+    NSURL *scriptUrl = [NSURL URLWithString:@"http://www.google.com/m"];
+    NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
+    if (data)
+        CONNECTIVITY = @"YES";
+    else
+        CONNECTIVITY = @"NO";
 }
 @end
