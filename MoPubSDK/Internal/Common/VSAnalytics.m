@@ -15,7 +15,7 @@
 
 static NSString *VS_Tracker_URL  = @"https://vs-analytics.voodoo-dev.io";
 static NSString *VS_INIT_URL  = @"https://voodoosauce.voodoo-dev.io/init?bundle_id=%@";
-
+static int VS_VERSION = 1;
 static NSTimeInterval kVSTrackerTimeoutInterval = 10.0;
 static NSString *SESSION_ID = nil;
 static NSString *BUNDLE_ID = nil;
@@ -23,15 +23,22 @@ static NSString *FIREHOSE_CHANNEL = nil;
 static BOOL DISABLED = YES;
 
 + (void) initTracker  {
-    BUNDLE_ID = [[NSBundle mainBundle] bundleIdentifier];
+    if (SESSION_ID == nil) {
+        SESSION_ID =  [[NSUUID UUID] UUIDString];
+    }
     
+    BUNDLE_ID = [[NSBundle mainBundle] bundleIdentifier];
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:VS_INIT_URL, BUNDLE_ID]]];
     
     [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         
         NSDictionary *dicData = [NSJSONSerialization JSONObjectWithData:data
                                                                    options:kNilOptions error:nil];
-        DISABLED = [dicData[@"disabled"] isEqualToString:@"yes"];
+        
+        DISABLED = [dicData[@"disabled"] isEqualToString:@"yes"]
+            || arc4random_uniform(10) % [dicData[@"devideBy"] longValue] != 0
+            || VS_VERSION < (int) dicData[@"minVersion"];
+            
         FIREHOSE_CHANNEL = dicData[@"firehoseChannel"];
     } errorHandler:^(NSError * error) {
         MPLogDebug(@"Failed to init vsanalytics");
@@ -43,21 +50,16 @@ static BOOL DISABLED = YES;
         return;
     }
     
-    if (SESSION_ID == nil) {
-        SESSION_ID =  [[NSUUID UUID] UUIDString];
-    }
-    
     NSDictionary *dicRequest = [NSJSONSerialization JSONObjectWithData:request
                                                         options:kNilOptions error:nil];
     
     NSDateFormatter *date = [[NSDateFormatter alloc] init];
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
-
-    BUNDLE_ID = dicRequest[@"bundle"] ? dicRequest[@"bundle"] : @"";
     
     NSDictionary *data= @{
                           @"meta": @{
                                   @"app_id": BUNDLE_ID,
+                                  @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
                                   @"type": @"REQUEST",
                                   @"session_id": SESSION_ID,
                                   @"processingDate":  [date stringFromDate:[NSDate date]],
@@ -77,17 +79,20 @@ static BOOL DISABLED = YES;
     NSDateFormatter *date = [[NSDateFormatter alloc] init];
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
 
-    NSDictionary *data= @{
-                      @"meta": @{
-                              @"app_id": BUNDLE_ID,
-                              @"type": @"RESPONSE",
-                              @"session_id": SESSION_ID,
-                              @"processingDate": [date stringFromDate:[NSDate date]],
-                              },
-                      @"event": dicResponse
-                      };
-
-    [self pixelProcess:data];
+    for (int i = 0; i < [dicResponse[@"ad-responses"] count]; i++) {
+        NSDictionary *data= @{
+                              @"meta": @{
+                                      @"app_id": BUNDLE_ID,
+                                      @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
+                                      @"type": @"RESPONSE",
+                                      @"session_id": SESSION_ID,
+                                      @"processingDate": [date stringFromDate:[NSDate date]],
+                                      },
+                              @"event": dicResponse[@"ad-responses"][i]
+                              };
+        
+        [self pixelProcess:data];
+    }
 }
 
 + (void) pixelTracker:(NSString *) eventType
@@ -113,6 +118,7 @@ static BOOL DISABLED = YES;
     NSDictionary *data= @{
                           @"meta": @{
                                   @"app_id": BUNDLE_ID,
+                                  @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
                                   @"type": eventType,
                                   @"session_id": SESSION_ID,
                                   @"processingDate": [date stringFromDate:[NSDate date]],
