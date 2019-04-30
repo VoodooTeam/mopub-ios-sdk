@@ -85,6 +85,7 @@
     }
 
     self.loading = YES;
+     NSLog(@"ad unit id %@", self.delegate.interstitialAdController.adUnitId);
     [self.communicator loadURL:URL];
 }
 

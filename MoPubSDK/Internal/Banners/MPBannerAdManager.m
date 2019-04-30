@@ -172,6 +172,8 @@
                                              userDataKeywords:self.targeting.userDataKeywords
                                                      location:self.targeting.location];
 
+    // add request
+    NSLog(@"ad unit id %@",[self.delegate adUnitId]);
     [self.communicator loadURL:URL];
 }
 

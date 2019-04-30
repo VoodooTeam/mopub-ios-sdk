@@ -21,6 +21,7 @@
         _loggingLevel = MPLogLevelNone;
         _mediatedNetworkConfigurations = nil;
         _moPubRequestOptions = nil;
+         
     }
 
     return self;

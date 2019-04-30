@@ -21,7 +21,6 @@ static NSTimeInterval kVSTrackerTimeoutInterval = 10.0;
 static NSString *SESSION_ID = nil;
 static NSString *BUNDLE_ID = nil;
 static NSString *FIREHOSE_CHANNEL = nil;
-static NSString *CUSTOM_CLASS = nil;
 static NSString *LATENCY_VALUE = nil;
 static NSString *CONNECTIVITY = @"NO";
 static BOOL DISABLED = YES;
@@ -107,6 +106,41 @@ static BOOL DISABLED = YES;
     }
 }
 
+
++ (void) pixelLatency:(NSData *) response {
+    
+    NSDictionary *dicResponse;
+    
+    if (DISABLED) {
+        return;
+    }
+    if (response) {
+        dicResponse = [NSJSONSerialization JSONObjectWithData:response
+                                                      options:kNilOptions error:nil];
+    }
+    
+    NSDateFormatter *date = [[NSDateFormatter alloc] init];
+    [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
+    
+    for (int i = 0; i < [dicResponse[@"ad-responses"] count]; i++) {
+        NSDictionary *data= @{
+                              @"meta": @{
+                                      @"app_id": BUNDLE_ID,
+                                      @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
+                                      @"type": @"RESPONSE",
+                                      @"session_id": SESSION_ID,
+                                      @"processingDate": [date stringFromDate:[NSDate date]],
+                                      @"latency": LATENCY_VALUE ?:@"",
+                                      @"connectivityStatus": CONNECTIVITY,
+                                      },
+                                @"event": dicResponse[@"ad-responses"][i]
+                              };
+        
+        [self pixelProcess:data];
+    }
+}
+
+
 + (void) pixelTracker:(NSString *) eventType
               impUrls:(NSArray<NSURL *> *) impUrls
              clickUrl:(NSURL *) clickUrl {
@@ -169,34 +203,38 @@ static BOOL DISABLED = YES;
 }
 
 
-+ (void)startLatencyCalcul:(NSString *)customId{
-    CUSTOM_CLASS = customId;
++ (void)startLatencyCalcul:(NSString *)adUnitID{
+    
     [VSAnalytics connectivity];
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    [defaults setObject:[NSDate date] forKey:CUSTOM_CLASS];
+    [defaults setObject:[NSDate date] forKey:adUnitID];
+    [defaults setObject:adUnitID forKey:@"ADUnit_LATENCY"]; 
     [defaults synchronize];
 }
 
-
-+ (void)calculateLatency:(NSString *)customClass{
++ (void)calculateLatencyFor:(NSString *)adUnitID
+                       data:(NSData *)response
+                      newAd:(NSString *)newUnit{
   
-    if (CUSTOM_CLASS && [NSUserDefaults.standardUserDefaults objectForKey:CUSTOM_CLASS]){
-        NSDate *start = [NSUserDefaults.standardUserDefaults objectForKey:CUSTOM_CLASS];
+    if (adUnitID && [NSUserDefaults.standardUserDefaults objectForKey:adUnitID]){
+        NSDate *start = [NSUserDefaults.standardUserDefaults objectForKey:adUnitID];
         
-        [NSUserDefaults.standardUserDefaults removeObjectForKey:CUSTOM_CLASS];
+        
+       
+        [NSUserDefaults.standardUserDefaults removeObjectForKey:adUnitID];
         [NSUserDefaults.standardUserDefaults synchronize];
         
         NSTimeInterval lastTime = ([NSDate date].timeIntervalSince1970 - start.timeIntervalSince1970);
         CGFloat rounded_down = floorf(lastTime * 100) / 100;
         LATENCY_VALUE = [NSString stringWithFormat:@"%.02f s", rounded_down];
         
-        NSLog(@"[SAUCE] latency for custom %@",customClass);
-        CUSTOM_CLASS = nil;
+        NSLog(@"[SAUCE] latency for custom %@",adUnitID);
+ 
+        [VSAnalytics pixelLatency:response];
     }
-    
-    [VSAnalytics startLatencyCalcul:customClass];
+    [VSAnalytics startLatencyCalcul:newUnit];
 }
 
 + (void)connectivity
@@ -208,4 +246,5 @@ static BOOL DISABLED = YES;
     else
         CONNECTIVITY = @"NO";
 }
+
 @end

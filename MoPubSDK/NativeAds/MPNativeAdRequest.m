@@ -143,6 +143,8 @@ static NSString * const kNativeAdErrorDomain = @"com.mopub.NativeAd";
     }
 
     self.loading = YES;
+    
+    NSLog(@"ad unit id %@",self.adUnitIdentifier);
     [self.communicator loadURL:URL];
 }
 

@@ -175,6 +175,7 @@
     }
 
     self.loading = YES;
+    NSLog(@"ad unit id %@",self.adUnitID);
     [self.communicator loadURL:URL];
 }
 

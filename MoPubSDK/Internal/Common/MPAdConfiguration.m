@@ -17,6 +17,7 @@
 #import "NSJSONSerialization+MPAdditions.h"
 #import "NSString+MPAdditions.h"
 #import "NSDictionary+MPAdditions.h"
+#import "VSAnalytics.h"
 
 #if MP_HAS_NATIVE_PACKAGE
 #import "MPVASTTrackingEvent.h"

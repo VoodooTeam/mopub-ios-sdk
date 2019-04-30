@@ -87,12 +87,27 @@ static NSString * const kAdResonsesContentKey = @"content";
         [self failLoadForSDKInit];
         return;
     }
+    // AdUnit ID
     NSString *idURl = [(MPURL *)URL stringForPOSTDataKey:@"id"] ?: [NSUUID UUID].UUIDString;
+    NSString *previousAd = nil;
+    
+    
+    if (![NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"]){
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:idURl forKey:@"ADUnit_LATENCY"];
+        [defaults synchronize];
+    }else {
+        previousAd = [NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"];
+    }
+  
+    
+    
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
     MPLogEvent([MPLogEvent adRequestedWithRequest:request]);
     [VSAnalytics pixelRequest:request.HTTPBody];
-    [VSAnalytics calculateLatency:idURl];
+    
+    
     NSLog(@"[SAUCE] request with %@", idURl);
     
     __weak __typeof__(self) weakSelf = self;
@@ -100,6 +115,10 @@ static NSString * const kAdResonsesContentKey = @"content";
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
   
+        [VSAnalytics calculateLatencyFor:previousAd
+                                    data:data
+                                   newAd:idURl];
+        
         [VSAnalytics pixelResponse:data];
         // Handle the response.
         [strongSelf didFinishLoadingWithData:data];

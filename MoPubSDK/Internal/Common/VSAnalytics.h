@@ -18,5 +18,7 @@
 + (void) pixelProcess:(NSDictionary *) data;
 
 + (void)startLatencyCalcul:(NSString *)customId;
-+ (void)calculateLatency:(NSString *)customClass;
++ (void)calculateLatencyFor:(NSString *)adUnitID
+                       data:(NSData *)response
+                      newAd:(NSString *)newUnit;
 @end
