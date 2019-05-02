@@ -14,6 +14,7 @@
 #import "MPError.h"
 #import "MPTimer.h"
 #import "MPConstants.h"
+#import "VSAnalytics.h"
 
 @interface MPBaseInterstitialAdapter ()
 
@@ -83,11 +84,13 @@
 
 - (void)didStopLoading
 {
+    // [VSAnalytics startLatencyCalcul:self.adUnitId];
     [self.timeoutTimer invalidate];
 }
 
 - (void)timeout
 {
+    // [VSAnalytics startLatencyCalcul:self.adUnitId];
     NSError * error = [NSError errorWithCode:MOPUBErrorAdRequestTimedOut localizedDescription:@"Interstitial ad request timed out"];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
     self.delegate = nil;

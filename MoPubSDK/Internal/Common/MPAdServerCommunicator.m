@@ -20,6 +20,7 @@
 #import "MPURLRequest.h"
 #import "VSAnalytics.h"
 #import "MPURL.h"
+#import "NSURL+MPAdditions.h"
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -85,39 +86,25 @@ static NSString * const kAdResonsesContentKey = @"content";
     // Check to be sure the SDK is initialized before starting the request
     if (!MoPub.sharedInstance.isSdkInitialized) {
         [self failLoadForSDKInit];
+        
         return;
     }
+    
     // AdUnit ID
-    NSString *idURl = [(MPURL *)URL stringForPOSTDataKey:@"id"] ?: [NSUUID UUID].UUIDString;
-    NSString *previousAd = nil;
+    NSString *idURl = [URL mp_queryParameterForKey:@"id"]? [URL mp_queryParameterForKey:@"id"] : [(MPURL *)URL stringForPOSTDataKey:@"id"] ;
     
-    
-    if (![NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"]){
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setObject:idURl forKey:@"ADUnit_LATENCY"];
-        [defaults synchronize];
-    }else {
-        previousAd = [NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"];
+    if (![NSUserDefaults.standardUserDefaults objectForKey:idURl]) {
+        [VSAnalytics startLatencyCalcul:idURl];
     }
-  
-    
     
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
-    MPLogEvent([MPLogEvent adRequestedWithRequest:request]);
     [VSAnalytics pixelRequest:request.HTTPBody];
-    
-    
-    NSLog(@"[SAUCE] request with %@", idURl);
     
     __weak __typeof__(self) weakSelf = self;
     self.task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
-  
-        [VSAnalytics calculateLatencyFor:previousAd
-                                    data:data
-                                   newAd:idURl];
         
         [VSAnalytics pixelResponse:data];
         // Handle the response.

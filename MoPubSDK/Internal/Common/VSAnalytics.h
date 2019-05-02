@@ -17,8 +17,7 @@
              clickUrl:(NSURL *) clickUrl;
 + (void) pixelProcess:(NSDictionary *) data;
 
-+ (void)startLatencyCalcul:(NSString *)customId;
++ (void)startLatencyCalcul:(NSString *)adUnitID;
 + (void)calculateLatencyFor:(NSString *)adUnitID
-                       data:(NSData *)response
-                      newAd:(NSString *)newUnit;
+                  adNetwork:(NSString *)adNetwork;
 @end

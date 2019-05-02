@@ -16,6 +16,7 @@
 #import "MPLogging.h"
 #import "MPAdImpressionTimer.h"
 #import "MPBannerCustomEvent+Internal.h"
+#import "VSAnalytics.h"
 
 @interface MPBannerCustomEventAdapter () <MPAdImpressionTimerDelegate>
 
@@ -149,6 +150,7 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didLoadAd:(UIView *)ad
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     [self didStopLoading];
     if (ad) {
         self.adView = ad;
@@ -160,6 +162,7 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didFailToLoadAdWithError:(NSError *)error
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }

@@ -25,6 +25,7 @@
 #import "MPMoPubRewardedPlayableCustomEvent.h"
 #import "MPRealTimeTimer.h"
 #import "NSString+MPAdditions.h"
+#import "VSAnalytics.h"
 
 static const NSUInteger kExcessiveCustomDataLength = 8196;
 
@@ -135,6 +136,7 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 
 - (void)timeout
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     NSError * error = [NSError errorWithCode:MOPUBErrorAdRequestTimedOut localizedDescription:@"Rewarded video ad request timed out"];
     [self.delegate rewardedVideoDidFailToLoadForAdapter:self error:error];
     self.delegate = nil;
@@ -142,6 +144,7 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 
 - (void)didStopLoading
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     [self.timeoutTimer invalidate];
 }
 

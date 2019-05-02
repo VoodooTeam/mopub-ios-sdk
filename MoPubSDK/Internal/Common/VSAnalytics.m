@@ -10,6 +10,7 @@
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import <UIKit/UIKit.h>
+#import "MPReachabilityManager.h"
 
 @implementation VSAnalytics {
 }
@@ -22,7 +23,6 @@ static NSString *SESSION_ID = nil;
 static NSString *BUNDLE_ID = nil;
 static NSString *FIREHOSE_CHANNEL = nil;
 static NSString *LATENCY_VALUE = nil;
-static NSString *CONNECTIVITY = @"NO";
 static BOOL DISABLED = YES;
 
 + (void) initTracker  {
@@ -74,12 +74,11 @@ static BOOL DISABLED = YES;
 }
 
 + (void) pixelResponse:(NSData *) response {
-  
-    NSDictionary *dicResponse;
-    
     if (DISABLED) {
         return;
     }
+    NSDictionary *dicResponse;
+
     if (response) {
        dicResponse = [NSJSONSerialization JSONObjectWithData:response
                                                                     options:kNilOptions error:nil];
@@ -96,8 +95,7 @@ static BOOL DISABLED = YES;
                                       @"type": @"RESPONSE",
                                       @"session_id": SESSION_ID,
                                       @"processingDate": [date stringFromDate:[NSDate date]],
-                                      @"latency": LATENCY_VALUE ?:@"",
-                                      @"connectivityStatus": CONNECTIVITY,
+                                      @"connectivity": [NSString stringWithFormat:@"%ld", (long)MPReachabilityManager.sharedManager.currentStatus],
                                       },
                               @"event": dicResponse[@"ad-responses"][i]
                               };
@@ -107,37 +105,29 @@ static BOOL DISABLED = YES;
 }
 
 
-+ (void) pixelLatency:(NSData *) response {
-    
-    NSDictionary *dicResponse;
-    
++ (void) pixelLatency: (NSString *) latency
+            adNetwork: (NSString *) adNetwork {
     if (DISABLED) {
         return;
-    }
-    if (response) {
-        dicResponse = [NSJSONSerialization JSONObjectWithData:response
-                                                      options:kNilOptions error:nil];
     }
     
     NSDateFormatter *date = [[NSDateFormatter alloc] init];
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
     
-    for (int i = 0; i < [dicResponse[@"ad-responses"] count]; i++) {
-        NSDictionary *data= @{
-                              @"meta": @{
+    NSDictionary *data= @{
+                          @"meta": @{
                                       @"app_id": BUNDLE_ID,
                                       @"vs_version": [NSNumber numberWithInteger:VS_VERSION],
-                                      @"type": @"RESPONSE",
+                                      @"type": @"LATENCY",
                                       @"session_id": SESSION_ID,
                                       @"processingDate": [date stringFromDate:[NSDate date]],
-                                      @"latency": LATENCY_VALUE ?:@"",
-                                      @"connectivityStatus": CONNECTIVITY,
-                                      },
-                                @"event": dicResponse[@"ad-responses"][i]
-                              };
-        
-        [self pixelProcess:data];
-    }
+                                      @"latency": latency,
+                                      @"adNetwork": adNetwork,
+                                      @"connectivity": [NSString stringWithFormat:@"%ld", (long)MPReachabilityManager.sharedManager.currentStatus]
+                                  }
+                          };
+    
+    [self pixelProcess:data];
 }
 
 
@@ -168,6 +158,7 @@ static BOOL DISABLED = YES;
                                   @"type": eventType,
                                   @"session_id": SESSION_ID,
                                   @"processingDate": [date stringFromDate:[NSDate date]],
+                                  @"connectivity": [NSString stringWithFormat:@"%ld", (long)MPReachabilityManager.sharedManager.currentStatus]
                                   },
                           @"event": @{
                                   @"url": links,
@@ -203,48 +194,30 @@ static BOOL DISABLED = YES;
 }
 
 
-+ (void)startLatencyCalcul:(NSString *)adUnitID{
-    
-    [VSAnalytics connectivity];
-    
++ (void) startLatencyCalcul:(NSString *) adUnitID {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
     [defaults setObject:[NSDate date] forKey:adUnitID];
-    [defaults setObject:adUnitID forKey:@"ADUnit_LATENCY"]; 
     [defaults synchronize];
 }
 
-+ (void)calculateLatencyFor:(NSString *)adUnitID
-                       data:(NSData *)response
-                      newAd:(NSString *)newUnit{
-  
-    if (adUnitID && [NSUserDefaults.standardUserDefaults objectForKey:adUnitID]){
++ (void) calculateLatencyFor:(NSString *) adUnitID
+                   adNetwork:(NSString *)adNetwork {
+    if (adUnitID && [NSUserDefaults.standardUserDefaults objectForKey:adUnitID]) {
         NSDate *start = [NSUserDefaults.standardUserDefaults objectForKey:adUnitID];
         
-        
-       
         [NSUserDefaults.standardUserDefaults removeObjectForKey:adUnitID];
         [NSUserDefaults.standardUserDefaults synchronize];
         
-        NSTimeInterval lastTime = ([NSDate date].timeIntervalSince1970 - start.timeIntervalSince1970);
-        CGFloat rounded_down = floorf(lastTime * 100) / 100;
-        LATENCY_VALUE = [NSString stringWithFormat:@"%.02f s", rounded_down];
+        CGFloat lastTime = [NSDate date].timeIntervalSince1970 - start.timeIntervalSince1970;
         
-        NSLog(@"[SAUCE] latency for custom %@",adUnitID);
+        if (lastTime > 40) {
+            return;
+        }
+        
+        // NSLog(@"[SAUCE] latency for custom %@ %@ %@",adUnitID, LATENCY_VALUE, adNetwork);
  
-        [VSAnalytics pixelLatency:response];
+        [VSAnalytics pixelLatency: [NSString stringWithFormat:@"%.02f", lastTime] adNetwork:adNetwork];
     }
-    [VSAnalytics startLatencyCalcul:newUnit];
-}
-
-+ (void)connectivity
-{
-    NSURL *scriptUrl = [NSURL URLWithString:@"http://www.google.com/m"];
-    NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
-    if (data)
-        CONNECTIVITY = @"YES";
-    else
-        CONNECTIVITY = @"NO";
 }
 
 @end

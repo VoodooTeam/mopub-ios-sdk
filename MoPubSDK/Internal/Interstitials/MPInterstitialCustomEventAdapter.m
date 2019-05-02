@@ -19,6 +19,7 @@
 #import "MPInterstitialAdController.h"
 #import "MPMRAIDInterstitialCustomEvent.h"
 #import "MPRealTimeTimer.h"
+#import "VSAnalytics.h"
 
 @interface MPInterstitialCustomEventAdapter ()
 
@@ -94,6 +95,7 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
                       didLoadAd:(id)ad
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     [self didStopLoading];
     [self.delegate adapterDidFinishLoadingAd:self];
 
@@ -116,6 +118,7 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
        didFailToLoadAdWithError:(NSError *)error
 {
+    [VSAnalytics calculateLatencyFor:self.adUnitId adNetwork:NSStringFromClass(self.configuration.customEventClass)];
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
