@@ -343,6 +343,8 @@
 
         // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
         NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
+       
+        NSLog(@"[Sauce] LATENCY TIME OUT BANNER %f configuration %@",duration,self.requestingConfiguration);
         [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
 
         MPLogAdEvent(MPLogEvent.adDidLoad, self.delegate.banner.adUnitId);

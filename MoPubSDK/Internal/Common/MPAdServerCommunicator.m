@@ -17,9 +17,12 @@
 #import "MPError.h"
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
-#import "MPURLRequest.h"
-#import "VSAnalytics.h"
+#import "MPURLRequest.h" 
 #import "MPURL.h"
+
+//VOODOO_SAUCE
+#import "VSLatency.h"
+#import "VSLatencyOperation.h"
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -87,47 +90,38 @@ static NSString * const kAdResonsesContentKey = @"content";
         [self failLoadForSDKInit];
         return;
     }
-    // AdUnit ID
-    NSString *idURl = [(MPURL *)URL stringForPOSTDataKey:@"id"] ?: [NSUUID UUID].UUIDString;
-    NSString *previousAd = nil;
-    
-    
-    if (![NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"]){
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setObject:idURl forKey:@"ADUnit_LATENCY"];
-        [defaults synchronize];
-    }else {
-        previousAd = [NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"];
-    }
-  
+//    // AdUnit ID
+//    NSString *idURl =  [NSUUID UUID].UUIDString;
+//    NSString *previousAd = nil;
+//
+//
+//    if (![NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"]){
+//        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//        [defaults setObject:idURl forKey:@"ADUnit_LATENCY"];
+//        [defaults synchronize];
+//    }else {
+//        previousAd = [NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"];
+//    }
+//
     
     
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
     MPLogEvent([MPLogEvent adRequestedWithRequest:request]);
-    [VSAnalytics pixelRequest:request.HTTPBody];
-    
-    
-    NSLog(@"[SAUCE] request with %@", idURl);
+ 
     
     __weak __typeof__(self) weakSelf = self;
     self.task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * data, NSHTTPURLResponse * response) {
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
-  
-        [VSAnalytics calculateLatencyFor:previousAd
-                                    data:data
-                                   newAd:idURl];
-        
-        [VSAnalytics pixelResponse:data];
+ 
         // Handle the response.
         [strongSelf didFinishLoadingWithData:data];
+ 
+        NSLog(@"[Sauce] response data" );
     } errorHandler:^(NSError * error) {
         // Capture strong self for the duration of this block.
         __typeof__(self) strongSelf = weakSelf;
-        // Handle the error.
-      
-        [VSAnalytics pixelResponse:nil];
         
         [strongSelf didFailWithError:error];
     }];
@@ -158,8 +152,22 @@ static NSString * const kAdResonsesContentKey = @"content";
                       adapterLoadDuration:(NSTimeInterval)duration
                         adapterLoadResult:(MPAfterLoadResult)result
 {
+    
+    // Convert the duration to milliseconds
+    NSString *durationMs = [NSString stringWithFormat:@"%llu", (unsigned long long)(duration * 1000)];
+    VSLatency *vsLatency = [[VSLatency alloc] initWithLatency:durationMs ?:@""
+                                                  networkType:configuration.networkType ?:@""
+                                                       adunit:@""];
+    // send data HERE
+    [VSLatencyOperation sendLatency:vsLatency];
+    
+    
+    
     NSArray * afterLoadUrls = [configuration afterLoadUrlsWithLoadDuration:duration loadResult:result];
-
+    NSLog(@"[Sauce] LATENCY TIME OUT send after load URL %f",duration);
+    
+    
+    // #VOODOOSAUCE# check if i have an informations here!
     for (NSURL * afterLoadUrl in afterLoadUrls) {
         MPURLRequest * request = [MPURLRequest requestWithURL:afterLoadUrl];
         [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * _Nonnull data, NSHTTPURLResponse * _Nonnull response) {

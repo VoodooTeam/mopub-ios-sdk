@@ -204,6 +204,7 @@
     // Record the start time of the adapter load.
     self.adapterLoadStartTimestamp = NSDate.now.timeIntervalSince1970;
 
+
     MPRewardedVideoAdapter *adapter = [[MPRewardedVideoAdapter alloc] initWithDelegate:self];
 
     if (adapter == nil) {
@@ -264,8 +265,9 @@
 
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
+    
+    NSLog(@"[SAUCE] rewartded duration latency %f",duration);
     [self.communicator sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
-
     MPLogAdEvent(MPLogEvent.adDidLoad, self.adUnitID);
     [self.delegate rewardedVideoDidLoadForAdManager:self];
 }

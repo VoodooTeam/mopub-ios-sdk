@@ -605,6 +605,12 @@
 		B2FE8FAB2069B28900593089 /* NSDictionary+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAA2069B28900593089 /* NSDictionary+MPAdditions.m */; };
 		B2FE8FAE2069B2B400593089 /* NSMutableArray+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAD2069B2B400593089 /* NSMutableArray+MPAdditions.m */; };
 		B2FE8FB0206ABFF500593089 /* MPDictionaryAdditionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAF206ABFF500593089 /* MPDictionaryAdditionTests.m */; };
+		B49F4854227C9C7500DE69C0 /* VSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4853227C9C7500DE69C0 /* VSOperation.m */; };
+		B49F4857227CA49500DE69C0 /* VSLatency.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4856227CA49500DE69C0 /* VSLatency.m */; };
+		B49F485D227CA52100DE69C0 /* VSLatencyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */; };
+		B49F485E227F2C0600DE69C0 /* VSOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = B49F4852227C9C7500DE69C0 /* VSOperation.h */; };
+		B49F485F227F2C0E00DE69C0 /* VSLatency.h in Headers */ = {isa = PBXBuildFile; fileRef = B49F4855227CA49500DE69C0 /* VSLatency.h */; };
+		B49F4860227F2C1100DE69C0 /* VSLatencyOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = B49F485B227CA52100DE69C0 /* VSLatencyOperation.h */; };
 		BC031AE4211CF93B00E4715B /* MPRewardedVideoRewardTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC031AE3211CF93B00E4715B /* MPRewardedVideoRewardTests.m */; };
 		BC06FF9720447D08003CF04C /* MoPub+Testing.m in Sources */ = {isa = PBXBuildFile; fileRef = BC06FF9620447D08003CF04C /* MoPub+Testing.m */; };
 		BC08C7831E36AD7C00444F16 /* MPVASTLinearAdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC08C7821E36AD7C00444F16 /* MPVASTLinearAdTests.m */; };
@@ -1348,6 +1354,12 @@
 		B2FE8FAC2069B2B400593089 /* NSMutableArray+MPAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+MPAdditions.h"; sourceTree = "<group>"; };
 		B2FE8FAD2069B2B400593089 /* NSMutableArray+MPAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+MPAdditions.m"; sourceTree = "<group>"; };
 		B2FE8FAF206ABFF500593089 /* MPDictionaryAdditionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPDictionaryAdditionTests.m; sourceTree = "<group>"; };
+		B49F4852227C9C7500DE69C0 /* VSOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VSOperation.h; sourceTree = "<group>"; };
+		B49F4853227C9C7500DE69C0 /* VSOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VSOperation.m; sourceTree = "<group>"; };
+		B49F4855227CA49500DE69C0 /* VSLatency.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VSLatency.h; sourceTree = "<group>"; };
+		B49F4856227CA49500DE69C0 /* VSLatency.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VSLatency.m; sourceTree = "<group>"; };
+		B49F485B227CA52100DE69C0 /* VSLatencyOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VSLatencyOperation.h; sourceTree = "<group>"; };
+		B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VSLatencyOperation.m; sourceTree = "<group>"; };
 		BC031AE3211CF93B00E4715B /* MPRewardedVideoRewardTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPRewardedVideoRewardTests.m; sourceTree = "<group>"; };
 		BC06FF9520447D08003CF04C /* MoPub+Testing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MoPub+Testing.h"; sourceTree = "<group>"; };
 		BC06FF9620447D08003CF04C /* MoPub+Testing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "MoPub+Testing.m"; sourceTree = "<group>"; };
@@ -2067,6 +2079,7 @@
 		AEF9D4D3171CA895005AAA5A /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				B49F4851227C9C4200DE69C0 /* VS */,
 				46ECD6E017E7A29500442BCA /* AdAlerts */,
 				875390C21B04073F001F0550 /* MPActivityViewControllerHelper.h */,
 				875390C31B04073F001F0550 /* MPActivityViewControllerHelper.m */,
@@ -2107,8 +2120,6 @@
 				A72210311B792C6F0099DCF6 /* MPVideoConfig.m */,
 				A776A5081B5DDE0A00095706 /* MPXMLParser.h */,
 				A776A5091B5DDE0A00095706 /* MPXMLParser.m */,
-				D04E09812179D04600BC16F5 /* VSAnalytics.h */,
-				D04E09822179D04700BC16F5 /* VSAnalytics.m */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -2306,6 +2317,21 @@
 				B2E3F53C1BAB8529000BB32D /* MOPUBNativeVideoAdRenderer.m */,
 			);
 			path = NativeVideo;
+			sourceTree = "<group>";
+		};
+		B49F4851227C9C4200DE69C0 /* VS */ = {
+			isa = PBXGroup;
+			children = (
+				D04E09812179D04600BC16F5 /* VSAnalytics.h */,
+				D04E09822179D04700BC16F5 /* VSAnalytics.m */,
+				B49F4852227C9C7500DE69C0 /* VSOperation.h */,
+				B49F4853227C9C7500DE69C0 /* VSOperation.m */,
+				B49F4855227CA49500DE69C0 /* VSLatency.h */,
+				B49F4856227CA49500DE69C0 /* VSLatency.m */,
+				B49F485B227CA52100DE69C0 /* VSLatencyOperation.h */,
+				B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */,
+			);
+			path = VS;
 			sourceTree = "<group>";
 		};
 		BC31026C21598E070007FA69 /* Internal */ = {
@@ -2593,6 +2619,7 @@
 				2AF0323A2016B78800909F29 /* MPProgressOverlayView.h in Headers */,
 				2AF0323B2016B78800909F29 /* MPRealTimeTimer.h in Headers */,
 				2AF0323C2016B78800909F29 /* MPURLActionInfo.h in Headers */,
+				B49F485E227F2C0600DE69C0 /* VSOperation.h in Headers */,
 				2AF0323D2016B78800909F29 /* MPURLResolver.h in Headers */,
 				2AF0323E2016B78800909F29 /* MPVideoConfig.h in Headers */,
 				2AF0323F2016B78800909F29 /* MPXMLParser.h in Headers */,
@@ -2630,6 +2657,7 @@
 				2AF032592016B78800909F29 /* MRController.h in Headers */,
 				2AF0325A2016B78800909F29 /* MRVideoPlayerManager.h in Headers */,
 				BCAD76A7214AE1A600A1B067 /* MPLogger.h in Headers */,
+				B49F485F227F2C0E00DE69C0 /* VSLatency.h in Headers */,
 				BC437058208A8AC9001B86D4 /* MPBool.h in Headers */,
 				2AF0325B2016B78800909F29 /* MRCommand.h in Headers */,
 				2AF0325C2016B78800909F29 /* MRProperty.h in Headers */,
@@ -2682,6 +2710,7 @@
 				2AF032832016B78800909F29 /* MPVASTTrackingEvent.h in Headers */,
 				2AF032842016B78800909F29 /* MPVASTWrapper.h in Headers */,
 				2AF032852016B78800909F29 /* MPVASTTracking.h in Headers */,
+				B49F4860227F2C1100DE69C0 /* VSLatencyOperation.h in Headers */,
 				2AF032862016B78800909F29 /* MPCoreInstanceProvider.h in Headers */,
 				2AF0328A2016B78800909F29 /* MPViewabilityTracker.h in Headers */,
 				2AF0328B2016B78800909F29 /* MPWebView+Viewability.h in Headers */,
@@ -3401,7 +3430,10 @@
 				A776A5661B5DDFF400095706 /* MPVASTMediaFile.m in Sources */,
 				A77FBEF618C533B400531E8A /* MPNativeAdRequestTargeting.m in Sources */,
 				AE515F73171F1B110086B464 /* MPInterstitialAdController.m in Sources */,
+				B49F4854227C9C7500DE69C0 /* VSOperation.m in Sources */,
+				B49F4857227CA49500DE69C0 /* VSLatency.m in Sources */,
 				D04E09832179D04700BC16F5 /* VSAnalytics.m in Sources */,
+				B49F485D227CA52100DE69C0 /* VSLatencyOperation.m in Sources */,
 				B2950B3F1FBE5E5B00C40BF5 /* MPBannerCustomEvent+Internal.m in Sources */,
 				B2FE8FAB2069B28900593089 /* NSDictionary+MPAdditions.m in Sources */,
 				AE515F74171F1B110086B464 /* MPInterstitialCustomEvent.m in Sources */,

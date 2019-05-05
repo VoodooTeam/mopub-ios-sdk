@@ -39,6 +39,9 @@ static BOOL DISABLED = YES;
         NSDictionary *dicData = [NSJSONSerialization JSONObjectWithData:data
                                                                    options:kNilOptions error:nil];
 
+        if (dicData[@"disabled"]) {
+            
+        }
         DISABLED = [dicData[@"disabled"] isEqualToString:@"yes"]
             || arc4random_uniform(10) % [dicData[@"devideBy"] longValue] != 0
             || VS_VERSION < (int) dicData[@"minVersion"];
@@ -46,6 +49,8 @@ static BOOL DISABLED = YES;
         FIREHOSE_CHANNEL = dicData[@"firehoseChannel"];
     } errorHandler:^(NSError * error) {
         MPLogDebug(@"Failed to init vsanalytics");
+        DISABLED = YES;
+        
     }];
 }
 
@@ -77,9 +82,9 @@ static BOOL DISABLED = YES;
   
     NSDictionary *dicResponse;
     
-    if (DISABLED) {
-        return;
-    }
+//    if (DISABLED) {
+//        return;
+//    }
     if (response) {
        dicResponse = [NSJSONSerialization JSONObjectWithData:response
                                                                     options:kNilOptions error:nil];
@@ -87,7 +92,9 @@ static BOOL DISABLED = YES;
 
     NSDateFormatter *date = [[NSDateFormatter alloc] init];
     [date setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
-
+   
+   
+    
     for (int i = 0; i < [dicResponse[@"ad-responses"] count]; i++) {
         NSDictionary *data= @{
                               @"meta": @{
@@ -101,6 +108,7 @@ static BOOL DISABLED = YES;
                                       },
                               @"event": dicResponse[@"ad-responses"][i]
                               };
+
 
     [self pixelProcess:data];
     }
@@ -221,8 +229,6 @@ static BOOL DISABLED = YES;
     if (adUnitID && [NSUserDefaults.standardUserDefaults objectForKey:adUnitID]){
         NSDate *start = [NSUserDefaults.standardUserDefaults objectForKey:adUnitID];
         
-        
-       
         [NSUserDefaults.standardUserDefaults removeObjectForKey:adUnitID];
         [NSUserDefaults.standardUserDefaults synchronize];
         

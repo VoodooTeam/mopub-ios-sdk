@@ -146,7 +146,7 @@
         [self.delegate manager:self didFailToLoadInterstitialWithError:[NSError errorWithCode:MOPUBErrorNoInventory]];
         return;
     }
-
+    
     [self fetchAdWithConfiguration:self.requestingConfiguration];
 }
 
@@ -214,6 +214,12 @@
 
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
+    
+    
+    
+    // i get the duration !!! here
+    NSLog(@"[Sauce] LATENCY TIME OUT interstial %f configuration %@",duration,self.requestingConfiguration);
+    
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
 
     MPLogAdEvent(MPLogEvent.adDidLoad, self.delegate.interstitialAdController.adUnitId);
