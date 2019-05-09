@@ -24,6 +24,7 @@
 #import "NSString+MPConsentStatus.h"
 #import "MPAdConversionTracker.h"
 #import "VSAnalytics.h"
+#import "VSLatencyOperation.h"
 
 // NSUserDefault keys
 static NSString * const kConsentedIabVendorListStorageKey        = @"com.mopub.mopub-ios-sdk.consented.iab.vendor.list";
@@ -1069,10 +1070,12 @@ static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kIfaForConsentStorageKey];
         [self setCurrentStatus:MPConsentStatusUnknown reason:kConsentedChangedReasonIfaChanged shouldBroadcast:YES];
     }
+    [VSLatencyOperation initLatencyConfig];
     
-    if (self.currentStatus == MPConsentStatusConsented) {
-        [VSAnalytics initTracker];
-    }
+//    if (self.currentStatus == MPConsentStatusConsented) {
+// 
+//
+//    }
 }
 
 - (void)removeIfa {

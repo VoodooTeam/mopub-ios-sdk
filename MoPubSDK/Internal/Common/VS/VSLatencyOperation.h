@@ -10,13 +10,15 @@
 #import "VSLatency.h"
 
 
-NS_ASSUME_NONNULL_BEGIN
 
 @interface VSLatencyOperation : NSObject
 
+
+/*  Sending latency informations to VS API
+ *  VSLatency : object containing latency' information
+ */
 + (void)sendLatency:(VSLatency *)vlatency;
 
++ (void)initLatencyConfig;
 
 @end
-
-NS_ASSUME_NONNULL_END

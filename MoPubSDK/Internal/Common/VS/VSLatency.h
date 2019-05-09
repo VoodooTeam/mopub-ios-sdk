@@ -14,7 +14,7 @@
 
 
 /**
- The network Latency
+ The network Latency in ms
  */
 @property (nonatomic, strong, nonnull) NSString *latencyMs;
 
@@ -48,6 +48,7 @@
 + (NSString *_Nonnull)vs_connectivity;
 
 
+/* init method */
 - (instancetype _Nullable )initWithLatency:(NSString *_Nonnull)latency
                                networkType:(NSString *_Nonnull)networkType
                                     adunit:(NSString *_Nonnull)adunit;

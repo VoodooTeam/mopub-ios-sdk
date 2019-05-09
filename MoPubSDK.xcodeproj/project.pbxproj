@@ -605,6 +605,9 @@
 		B2FE8FAB2069B28900593089 /* NSDictionary+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAA2069B28900593089 /* NSDictionary+MPAdditions.m */; };
 		B2FE8FAE2069B2B400593089 /* NSMutableArray+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAD2069B2B400593089 /* NSMutableArray+MPAdditions.m */; };
 		B2FE8FB0206ABFF500593089 /* MPDictionaryAdditionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FE8FAF206ABFF500593089 /* MPDictionaryAdditionTests.m */; };
+		B46448A82281D6E700FFD579 /* VSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4853227C9C7500DE69C0 /* VSOperation.m */; };
+		B46448A92281D6E700FFD579 /* VSLatency.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4856227CA49500DE69C0 /* VSLatency.m */; };
+		B46448AA2281D6E700FFD579 /* VSLatencyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */; };
 		B49F4854227C9C7500DE69C0 /* VSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4853227C9C7500DE69C0 /* VSOperation.m */; };
 		B49F4857227CA49500DE69C0 /* VSLatency.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4856227CA49500DE69C0 /* VSLatency.m */; };
 		B49F485D227CA52100DE69C0 /* VSLatencyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */; };
@@ -3068,6 +3071,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B46448A82281D6E700FFD579 /* VSOperation.m in Sources */,
+				B46448A92281D6E700FFD579 /* VSLatency.m in Sources */,
+				B46448AA2281D6E700FFD579 /* VSLatencyOperation.m in Sources */,
 				D0982F272179FB6D003B52DB /* VSAnalytics.m in Sources */,
 				2A27020B20214502004A72E6 /* MOPUBExperimentProvider.m in Sources */,
 				2A27020C20214502004A72E6 /* MOPUBActivityIndicatorView.m in Sources */,

@@ -33,17 +33,17 @@ static BOOL DISABLED = YES;
     
     
     NSDictionary *params = @{
-                                vsSourceIdKey   :[VSLatency vs_sourceID],
-                                vsPlatformKey   :[VSLatency vs_platform],
-                                vsVersionKey    :[VSLatency vs_version],
+                             vsSourceIdKey   :[VSLatency vs_sourceID],
+                             vsPlatformKey   :[VSLatency vs_platform],
+                             vsVersionKey    :[VSLatency vs_version],
                              };
     
-    [VSOperation request:[NSURL URLWithString:@""]
+    [VSOperation request:[NSURL URLWithString:@"https://private-48bbe3-vadataapi.apiary-mock.com/?init"]
               httpMethod:VSHTTPMethodPost
-              parameters:params
+              parameters:nil
                  headers:nil
                  success:^(id  _Nullable responseObject) {
-                   
+                     
                      if ([responseObject isEqual:[NSNull null]] ||
                          ![responseObject isKindOfClass:NSDictionary.class]) {
                          DISABLED = YES;
@@ -57,7 +57,7 @@ static BOOL DISABLED = YES;
                          return;
                      }
                      
-                     if ([[data objectForKey:kIsActiveKey] isEqual:[NSNull null]]){
+                     if ([[data objectForKey:kIsActiveKey] isEqual:[NSNull null]] || ![data objectForKey:kIsActiveKey] ){
                          DISABLED = YES;
                      } else {
                          DISABLED = [[data objectForKey:kIsActiveKey] boolValue];
@@ -71,40 +71,34 @@ static BOOL DISABLED = YES;
 
 
 /*
- * send latency data
-    "source_id": "bundle id",
-    "platform": "ios|android",
-    "vs_version": "3.0.1",
-    "network": "applovin",
-    "latency": 210,
-    "ad_unit": "FS",
-    "connectivity": "WIFI"
+ *
  */
 + (void)sendLatency:(VSLatency *)vlatency{
     
-    // parse data
-    
-    NSDictionary *params = @{
-                             vsSourceIdKey       :[VSLatency vs_sourceID],
-                             vsPlatformKey       :[VSLatency vs_platform],
-                             vsVersionKey        :[VSLatency vs_version],
-                             vsConnectivity      :[VSLatency vs_connectivity],
-                             
-                             kNetwork            :vlatency.networkType,
-                             kAdunit             :vlatency.adUnit,
-                             kLatency            :vlatency.latencyMs,
-                             };
-    
-    [VSOperation request:[NSURL URLWithString:@""]
-              httpMethod:VSHTTPMethodPost
-              parameters:params
-                 headers:nil
-                 success:^(id  _Nullable responseObject) {
-                    NSLog(@"[SAUCE] success to send data");
-                 }
-                 failure:^(NSError *error) {
-                    NSLog(@"[SAUCE] Failed to send data");
-                 }];
+    if (!DISABLED){
+        // parse data
+        NSDictionary *params = @{
+                                 vsSourceIdKey       :[VSLatency vs_sourceID],
+                                 vsPlatformKey       :[VSLatency vs_platform],
+                                 vsVersionKey        :[VSLatency vs_version],
+                                 vsConnectivity      :[VSLatency vs_connectivity],
+                                 
+                                 kNetwork            :vlatency.networkType,
+                                 kAdunit             :vlatency.adUnit,
+                                 kLatency            :vlatency.latencyMs,
+                                 };
+        
+        [VSOperation request:[NSURL URLWithString:@"https://private-48bbe3-vadataapi.apiary-mock.com/?sendMetrics"]
+                  httpMethod:VSHTTPMethodPost
+                  parameters:params
+                     headers:nil
+                     success:^(id  _Nullable responseObject) {
+                         NSLog(@"[SAUCE] success to send data");
+                     }
+                     failure:^(NSError *error) {
+                         NSLog(@"[SAUCE] Failed to send data");
+                     }];
+    }
 }
 
 @end

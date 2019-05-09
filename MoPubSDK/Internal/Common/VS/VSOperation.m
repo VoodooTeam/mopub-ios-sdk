@@ -30,7 +30,7 @@
     }
  
     
-    if (method == VSHTTPMethodGet) {
+    if (method == VSHTTPMethodPost) {
         url = [VSOperation VAURLByAddingGetParameters:params
                                                   url:url];
     }
