@@ -608,6 +608,9 @@
 		B46448A82281D6E700FFD579 /* VSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4853227C9C7500DE69C0 /* VSOperation.m */; };
 		B46448A92281D6E700FFD579 /* VSLatency.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4856227CA49500DE69C0 /* VSLatency.m */; };
 		B46448AA2281D6E700FFD579 /* VSLatencyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */; };
+		B493339D2289BD82002BC771 /* NSObject+VSLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = B493339B2289BD82002BC771 /* NSObject+VSLoader.m */; };
+		B493339E2289BD89002BC771 /* NSObject+VSLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = B493339C2289BD82002BC771 /* NSObject+VSLoader.h */; };
+		B493339F2289BDA6002BC771 /* NSObject+VSLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = B493339B2289BD82002BC771 /* NSObject+VSLoader.m */; };
 		B49F4854227C9C7500DE69C0 /* VSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4853227C9C7500DE69C0 /* VSOperation.m */; };
 		B49F4857227CA49500DE69C0 /* VSLatency.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F4856227CA49500DE69C0 /* VSLatency.m */; };
 		B49F485D227CA52100DE69C0 /* VSLatencyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B49F485C227CA52100DE69C0 /* VSLatencyOperation.m */; };
@@ -1357,6 +1360,8 @@
 		B2FE8FAC2069B2B400593089 /* NSMutableArray+MPAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+MPAdditions.h"; sourceTree = "<group>"; };
 		B2FE8FAD2069B2B400593089 /* NSMutableArray+MPAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+MPAdditions.m"; sourceTree = "<group>"; };
 		B2FE8FAF206ABFF500593089 /* MPDictionaryAdditionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPDictionaryAdditionTests.m; sourceTree = "<group>"; };
+		B493339B2289BD82002BC771 /* NSObject+VSLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+VSLoader.m"; sourceTree = "<group>"; };
+		B493339C2289BD82002BC771 /* NSObject+VSLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+VSLoader.h"; sourceTree = "<group>"; };
 		B49F4852227C9C7500DE69C0 /* VSOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VSOperation.h; sourceTree = "<group>"; };
 		B49F4853227C9C7500DE69C0 /* VSOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VSOperation.m; sourceTree = "<group>"; };
 		B49F4855227CA49500DE69C0 /* VSLatency.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VSLatency.h; sourceTree = "<group>"; };
@@ -2325,6 +2330,8 @@
 		B49F4851227C9C4200DE69C0 /* VS */ = {
 			isa = PBXGroup;
 			children = (
+				B493339C2289BD82002BC771 /* NSObject+VSLoader.h */,
+				B493339B2289BD82002BC771 /* NSObject+VSLoader.m */,
 				D04E09812179D04600BC16F5 /* VSAnalytics.h */,
 				D04E09822179D04700BC16F5 /* VSAnalytics.m */,
 				B49F4852227C9C7500DE69C0 /* VSOperation.h */,
@@ -2701,6 +2708,7 @@
 				2AF0327A2016B78800909F29 /* MPVASTInline.h in Headers */,
 				2AF0327B2016B78800909F29 /* MPVASTLinearAd.h in Headers */,
 				2AF0327C2016B78800909F29 /* MPVASTMacroProcessor.h in Headers */,
+				B493339E2289BD89002BC771 /* NSObject+VSLoader.h in Headers */,
 				BCCEE891214B04E5003BD130 /* MPConsoleLogger.h in Headers */,
 				2AF0327D2016B78800909F29 /* MPVASTManager.h in Headers */,
 				BCA762322149B4B100D55A05 /* MPLogEvent.h in Headers */,
@@ -3174,6 +3182,7 @@
 				2A27026720214502004A72E6 /* MPBannerCustomEvent+Internal.m in Sources */,
 				2A27026820214502004A72E6 /* MPBannerAdManager.m in Sources */,
 				2A27026920214502004A72E6 /* MPBannerCustomEventAdapter.m in Sources */,
+				B493339F2289BDA6002BC771 /* NSObject+VSLoader.m in Sources */,
 				2A27026A20214502004A72E6 /* MPBaseBannerAdapter.m in Sources */,
 				2A27026B20214502004A72E6 /* MPBaseInterstitialAdapter.m in Sources */,
 				2A27026C20214502004A72E6 /* MPInterstitialAdManager.m in Sources */,
@@ -3380,6 +3389,7 @@
 				573A83031B8E488400ED4067 /* MPTableViewAdPlacerCell.m in Sources */,
 				57B86B5719C78F5D00AD50EE /* MPConstants.m in Sources */,
 				AE515F63171F1B110086B464 /* MRProperty.m in Sources */,
+				B493339D2289BD82002BC771 /* NSObject+VSLoader.m in Sources */,
 				B2FE8FAE2069B2B400593089 /* NSMutableArray+MPAdditions.m in Sources */,
 				A776A5461B5DDFBC00095706 /* MPVASTLinearAd.m in Sources */,
 				57AC696E1BB21FA20053C556 /* MOPUBPlayerView.m in Sources */,

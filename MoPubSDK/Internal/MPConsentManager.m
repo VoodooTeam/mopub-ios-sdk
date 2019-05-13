@@ -1069,13 +1069,7 @@ static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kLastSynchronizedConsentStatusStorageKey];
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kIfaForConsentStorageKey];
         [self setCurrentStatus:MPConsentStatusUnknown reason:kConsentedChangedReasonIfaChanged shouldBroadcast:YES];
-    }
-    [VSLatencyOperation initLatencyConfig];
-    
-//    if (self.currentStatus == MPConsentStatusConsented) {
-// 
-//
-//    }
+    } 
 }
 
 - (void)removeIfa {

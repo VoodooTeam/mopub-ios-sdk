@@ -40,7 +40,7 @@ static BOOL DISABLED = YES;
     
     [VSOperation request:[NSURL URLWithString:@"https://private-48bbe3-vadataapi.apiary-mock.com/?init"]
               httpMethod:VSHTTPMethodPost
-              parameters:nil
+              parameters:params
                  headers:nil
                  success:^(id  _Nullable responseObject) {
                      

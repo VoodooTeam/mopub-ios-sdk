@@ -51,7 +51,7 @@
     NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
     if (data)
         // add rechability
-        return  @"WIFI";
+        return  @"Connected";
     else
         return  @"not rechable";
 }
