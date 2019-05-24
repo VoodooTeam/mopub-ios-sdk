@@ -11,6 +11,10 @@
 #import "MPAdConfiguration.h"
 #import "MPGlobal.h"
 
+//VOODOO_SAUCE
+#import "VSLatency.h"
+#import "VSLatencyOperation.h"
+
 @protocol MPAdServerCommunicatorDelegate;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +34,12 @@
                       adapterLoadDuration:(NSTimeInterval)duration
                         adapterLoadResult:(MPAfterLoadResult)result;
 
+
+-(void)vs_sendAfterLoadUrlWithConfiguration:(MPAdConfiguration *)configuration
+                        adapterLoadDuration:(NSTimeInterval)duration
+                          adapterLoadResult:(MPAfterLoadResult)result
+                                     adType:(VSUnitFormat)type
+                                waterfallId:(NSString *)waterfallid;
 @end
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

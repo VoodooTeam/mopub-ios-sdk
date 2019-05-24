@@ -315,7 +315,7 @@ static NSString * const kNativeAdErrorDomain = @"com.mopub.NativeAd";
 {
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.adConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
+    [self.communicator sendAfterLoadUrlWithConfiguration:self.adConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded]; 
 
     // Add the click tracker url from the header to our set.
     if (self.adConfiguration.clickTrackingURL) {

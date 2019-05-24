@@ -10,25 +10,24 @@
 
 
 
+/**
+ A representation of the API Endpoints
+ */
+typedef enum VSUnitFormat {
+    VS_FS,
+    VS_RV,
+    VS_BANNER,
+    VS_NATIVE
+    
+} VSUnitFormat;
+
 @interface VSLatency : NSObject
 
 
 /**
- The network Latency in ms
+ The network Latency in ms Integer 
  */
-@property (nonatomic, strong, nonnull) NSString *latencyMs;
-
-
-/**
- The network name
- */
-@property (nonatomic, strong, nonnull) NSString *networkType;
-
-
-/**
- The adUnit value
- */
-@property (nonatomic, strong, nonnull) NSString *adUnit;
+@property (nonatomic) double latencyMs;
 
 
 
@@ -46,12 +45,16 @@
 
 /* vs_version : voodoo_sauce version */
 + (NSString *_Nonnull)vs_connectivity;
+ 
+/* userID :idfa */
++ (NSString *_Nonnull)vs_userID;
 
 
-/* init method */
-- (instancetype _Nullable )initWithLatency:(NSString *_Nonnull)latency
-                               networkType:(NSString *_Nonnull)networkType
-                                    adunit:(NSString *_Nonnull)adunit;
+/* init method with latency */
+- (instancetype _Nullable )initWithLatency:(double)latency;
+
+
++ (NSString *_Nonnull)formatUnitfromType:(VSUnitFormat)endpoint;
 @end
 
 

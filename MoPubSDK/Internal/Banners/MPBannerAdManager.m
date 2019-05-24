@@ -19,6 +19,10 @@
 #import "NSMutableArray+MPAdditions.h"
 #import "NSDate+MPAdditions.h"
 #import "NSError+MPAdditions.h"
+#import "VSLatency.h"
+#import "VSLatencyOperation.h"
+
+static NSString *WATERFALL_BANNER_ID = nil;
 
 @interface MPBannerAdManager ()
 
@@ -57,6 +61,11 @@
 {
     self = [super init];
     if (self) {
+        
+        if(!WATERFALL_BANNER_ID || self.requestingConfiguration.isEndOfWaterfall){
+            WATERFALL_BANNER_ID = [[NSUUID UUID] UUIDString];
+        }
+        
         self.delegate = delegate;
 
         self.communicator = [[MPAdServerCommunicator alloc] initWithDelegate:self];
@@ -73,6 +82,8 @@
 
         self.automaticallyRefreshesContents = YES;
         self.currentOrientation = MPInterfaceOrientation();
+ 
+        NSLog(@"init banner %@",WATERFALL_BANNER_ID);
     }
     return self;
 }
@@ -175,6 +186,9 @@
     // add request
     NSLog(@"ad unit id %@",[self.delegate adUnitId]);
     [self.communicator loadURL:URL];
+    
+    NSLog(@"load banner %@",WATERFALL_BANNER_ID);
+
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation
@@ -260,6 +274,8 @@
 
 - (void)communicatorDidReceiveAdConfigurations:(NSArray<MPAdConfiguration *> *)configurations
 {
+    
+    NSLog(@"communicatorDidReceiveAdConfigurations %@",WATERFALL_BANNER_ID);
     self.remainingConfigurations = [configurations mutableCopy];
     self.requestingConfiguration = [self.remainingConfigurations removeFirst];
 
@@ -332,11 +348,19 @@
         if (![self shouldScheduleTimerOnImpressionDisplay]) {
             [self scheduleRefreshTimer];
         }
+        // send Impression
+        [VSLatencyOperation senddata:nil
+                         customClass:NSStringFromClass(self.requestingConfiguration.customEventClass)
+                         waterfallID:WATERFALL_BANNER_ID
+                          adunitType:VS_BANNER
+                                type:VSAImpressionEvent];
+        WATERFALL_BANNER_ID = [[NSUUID UUID] UUIDString];
     }
 }
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFinishLoadingAd:(UIView *)ad
 {
+
     if (self.requestingAdapter == adapter) {
         self.remainingConfigurations = nil;
         self.requestingAdapterAdContentView = ad;
@@ -345,7 +369,8 @@
         NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
        
         NSLog(@"[Sauce] LATENCY TIME OUT BANNER %f configuration %@",duration,self.requestingConfiguration);
-        [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
+  
+        [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded adType:VS_BANNER waterfallId:WATERFALL_BANNER_ID];
 
         MPLogAdEvent(MPLogEvent.adDidLoad, self.delegate.banner.adUnitId);
         [self presentRequestingAdapter];
@@ -358,7 +383,8 @@
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
+    
+    [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result adType:VS_BANNER waterfallId:WATERFALL_BANNER_ID];
 
     if (self.requestingAdapter == adapter) {
         // There are more ad configurations to try.

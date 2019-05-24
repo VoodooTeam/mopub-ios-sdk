@@ -19,6 +19,8 @@
 #import "NSDate+MPAdditions.h"
 #import "NSError+MPAdditions.h"
 
+static NSString *WATERFALL_REWARDED_ID = nil;
+
 @interface MPRewardedVideoAdManager () <MPAdServerCommunicatorDelegate, MPRewardedVideoAdapterDelegate>
 
 @property (nonatomic, strong) MPRewardedVideoAdapter *adapter;
@@ -40,6 +42,10 @@
         _adUnitID = [adUnitID copy];
         _communicator = [[MPAdServerCommunicator alloc] initWithDelegate:self];
         _delegate = delegate;
+      
+        if(!WATERFALL_REWARDED_ID || self.configuration.isEndOfWaterfall){
+            WATERFALL_REWARDED_ID = [[NSUUID UUID] UUIDString];
+        }
     }
 
     return self;
@@ -153,6 +159,16 @@
     }
 
     [self.adapter presentRewardedVideoFromViewController:viewController customData:customData];
+ 
+    
+    // send Impression
+    [VSLatencyOperation senddata:nil
+                     customClass:NSStringFromClass(self.configuration.customEventClass)
+                     waterfallID:WATERFALL_REWARDED_ID
+                      adunitType:VS_RV
+                            type:VSAImpressionEvent];
+     
+    WATERFALL_REWARDED_ID  =  [[NSUUID UUID] UUIDString];
 }
 
 - (void)handleAdPlayedForCustomEventNetwork
@@ -267,7 +283,7 @@
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
     
     NSLog(@"[SAUCE] rewartded duration latency %f",duration);
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
+    [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded adType:VS_RV waterfallId:WATERFALL_REWARDED_ID];
     MPLogAdEvent(MPLogEvent.adDidLoad, self.adUnitID);
     [self.delegate rewardedVideoDidLoadForAdManager:self];
 }
@@ -278,7 +294,8 @@
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:result];
+    
+    [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:result adType:VS_RV waterfallId:WATERFALL_REWARDED_ID];
 
     // There are more ad configurations to try.
     if (self.remainingConfigurations.count > 0) {

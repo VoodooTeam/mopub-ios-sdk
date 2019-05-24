@@ -20,9 +20,7 @@
 #import "MPURLRequest.h" 
 #import "MPURL.h"
 
-//VOODOO_SAUCE
-#import "VSLatency.h"
-#import "VSLatencyOperation.h"
+
 
 // Multiple response JSON fields
 static NSString * const kAdResponsesKey = @"ad-responses";
@@ -90,20 +88,7 @@ static NSString * const kAdResonsesContentKey = @"content";
         [self failLoadForSDKInit];
         return;
     }
-//    // AdUnit ID
-//    NSString *idURl =  [NSUUID UUID].UUIDString;
-//    NSString *previousAd = nil;
-//
-//
-//    if (![NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"]){
-//        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-//        [defaults setObject:idURl forKey:@"ADUnit_LATENCY"];
-//        [defaults synchronize];
-//    }else {
-//        previousAd = [NSUserDefaults.standardUserDefaults objectForKey:@"ADUnit_LATENCY"];
-//    }
-//
-    
+ 
     
     // Generate request
     MPURLRequest * request = [[MPURLRequest alloc] initWithURL:URL];
@@ -153,21 +138,10 @@ static NSString * const kAdResonsesContentKey = @"content";
                         adapterLoadResult:(MPAfterLoadResult)result
 {
     
-    // Convert the duration to milliseconds
-    NSString *durationMs = [NSString stringWithFormat:@"%llu", (unsigned long long)(duration * 1000)];
-    VSLatency *vsLatency = [[VSLatency alloc] initWithLatency:durationMs ?:@""
-                                                  networkType:configuration.networkType ?:@""
-                                                       adunit:@""];
-    // send data HERE
-    [VSLatencyOperation sendLatency:vsLatency];
-    
-    
-    
     NSArray * afterLoadUrls = [configuration afterLoadUrlsWithLoadDuration:duration loadResult:result];
     NSLog(@"[Sauce] LATENCY TIME OUT send after load URL %f",duration);
     
-    
-    // #VOODOOSAUCE# check if i have an informations here!
+
     for (NSURL * afterLoadUrl in afterLoadUrls) {
         MPURLRequest * request = [MPURLRequest requestWithURL:afterLoadUrl];
         [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * _Nonnull data, NSHTTPURLResponse * _Nonnull response) {
@@ -301,6 +275,31 @@ static NSString * const kAdResonsesContentKey = @"content";
     NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:errorMessage
                                                           forKey:NSLocalizedDescriptionKey];
     return [NSError errorWithDomain:@"mopub.com" code:statusCode userInfo:errorInfo];
+}
+
+
+-(void)vs_sendAfterLoadUrlWithConfiguration:(MPAdConfiguration *)configuration
+                        adapterLoadDuration:(NSTimeInterval)duration
+                          adapterLoadResult:(MPAfterLoadResult)result
+                                     adType:(VSUnitFormat)type
+                                waterfallId:(NSString *)waterfallid{
+    
+   
+ 
+    if (duration >0){
+
+        VSLatency *vsLatency = [[VSLatency alloc] initWithLatency:duration];
+
+    NSStringFromClass(configuration.customEventClass));
+        [VSLatencyOperation senddata:vsLatency
+                         customClass:NSStringFromClass(configuration.customEventClass)
+                         waterfallID:waterfallid
+                          adunitType:type
+                                type:VSLatencyEvent];
+    
+    }
+    
+    [self sendAfterLoadUrlWithConfiguration:configuration adapterLoadDuration:duration adapterLoadResult:result];
 }
 
 @end

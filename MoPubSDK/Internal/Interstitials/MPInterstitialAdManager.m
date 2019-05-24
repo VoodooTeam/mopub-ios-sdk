@@ -23,6 +23,11 @@
 #import "NSDate+MPAdditions.h"
 #import "NSError+MPAdditions.h"
 
+//external
+#import "VSLatency.h"
+#import "VSLatencyOperation.h"
+
+
 @interface MPInterstitialAdManager ()
 
 @property (nonatomic, assign) BOOL loading;
@@ -40,6 +45,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static NSString *WATERFALL_INTERSTITIAL_ID = nil;
+
 @implementation MPInterstitialAdManager
 
 @synthesize loading = _loading;
@@ -55,6 +62,10 @@
     if (self) {
         self.communicator = [[MPAdServerCommunicator alloc] initWithDelegate:self];
         self.delegate = delegate;
+ 
+        if(!WATERFALL_INTERSTITIAL_ID || self.requestingConfiguration.isEndOfWaterfall){
+            WATERFALL_INTERSTITIAL_ID = [[NSUUID UUID] UUIDString];
+        }
     }
     return self;
 }
@@ -115,7 +126,15 @@
         return;
     }
 
-    [self.adapter showInterstitialFromViewController:controller];
+    [self.adapter showInterstitialFromViewController:controller]; 
+    // send Impression
+    [VSLatencyOperation senddata:nil
+                     customClass:NSStringFromClass(self.requestingConfiguration.customEventClass)
+                     waterfallID:WATERFALL_INTERSTITIAL_ID
+                      adunitType:VS_FS
+                            type:VSAImpressionEvent]; 
+
+    WATERFALL_INTERSTITIAL_ID  = [[NSUUID UUID] UUIDString];
 }
 
 - (CLLocation *)location
@@ -220,7 +239,7 @@
     // i get the duration !!! here
     NSLog(@"[Sauce] LATENCY TIME OUT interstial %f configuration %@",duration,self.requestingConfiguration);
     
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
+    [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded adType:VS_FS waterfallId:WATERFALL_INTERSTITIAL_ID];
 
     MPLogAdEvent(MPLogEvent.adDidLoad, self.delegate.interstitialAdController.adUnitId);
     [self.delegate managerDidLoadInterstitial:self];
@@ -232,7 +251,8 @@
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
-    [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
+    
+    [self.communicator vs_sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result adType:VS_FS waterfallId:WATERFALL_INTERSTITIAL_ID];
 
     // There are more ad configurations to try.
     if (self.remainingConfigurations.count > 0) {
