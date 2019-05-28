@@ -290,7 +290,7 @@ static NSString * const kAdResonsesContentKey = @"content";
 
         VSLatency *vsLatency = [[VSLatency alloc] initWithLatency:duration];
 
-    NSStringFromClass(configuration.customEventClass));
+        NSStringFromClass(configuration.customEventClass);
         [VSLatencyOperation senddata:vsLatency
                          customClass:NSStringFromClass(configuration.customEventClass)
                          waterfallID:waterfallid

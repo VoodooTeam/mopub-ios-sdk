@@ -28,13 +28,7 @@
                                                                            userInfo:nil]];
         return;
     }
- 
-    
-    if (method == VSHTTPMethodPost) {
-        url = [VSOperation VAURLByAddingGetParameters:params
-                                                  url:url];
-    }
-    
+  
     // Create the URLSession on the default configuration
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];

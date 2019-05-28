@@ -121,7 +121,7 @@ static BOOL BANNER_ACTIVATED = false;
             break;
     }
     
-    NSMutableDictionary *params =   [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary *body =   [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                      [VSLatency vs_sourceID],                                      vsSourceIdKey,
                                      [VSLatency vs_platform],                                      vsPlatformKey,
                                      [VSLatency vs_version],                                       vsVersionKey,
@@ -139,15 +139,12 @@ static BOOL BANNER_ACTIVATED = false;
         
         if (eventType == VSLatencyEvent && vlatency && vlatency.latencyMs){
             int result = (int)roundf(vlatency.latencyMs * 1000);
-            [params setObject: [NSString stringWithFormat:@"@%d", result] forKey:kLatency];
-        }
-        
-        NSDictionary *dictionary = [[NSDictionary alloc] init];
-        dictionary = [params mutableCopy];
-        
+            [body setObject: [NSNumber numberWithInt:result] forKey:kLatency];
+        } 
+
         [VSOperation request:[NSURL URLWithString:[self hostName:VSAPIEndPointMetric]]
                   httpMethod:VSHTTPMethodPost
-                  parameters:dictionary
+                  parameters:body
                      headers:nil
                      success:^(id  _Nullable responseObject) {
                          NSLog(@"[SAUCE] success to send data");
